@@ -21,6 +21,7 @@ export function PricingSplit({ stripeReady }: { stripeReady: boolean }) {
       <article className="rounded-3xl border-2 border-ah-green bg-white p-6 shadow-card">
         <p className="text-sm font-semibold text-ah-green-dark">AppHole Pro</p>
         <h3 className="mt-2 text-2xl font-bold">Go deeper. Retest. Plug more holes.</h3>
+        <p className="mt-1 text-lg font-semibold text-ah-ink">$29/month</p>
         <ul className="mt-4 space-y-2 text-sm text-ah-muted">
           <li>Deeper public crawl</li>
           <li>Saved scan history</li>

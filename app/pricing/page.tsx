@@ -8,7 +8,7 @@ export default function PricingPage() {
     <div className="mx-auto max-w-5xl px-4 py-14">
       <h1 className="text-4xl font-bold">Free vs Pro</h1>
       <p className="mt-3 max-w-2xl text-ah-muted">
-        Two plans. The dollar amount lives in Stripe when you are ready to charge. Until a price id is configured, Free checks still run.
+        Two plans. AppHole Pro is $29/month. Checkout is handled by Stripe.
       </p>
       <div className="mt-10">
         <PricingSplit stripeReady={stripeConfigured()} />

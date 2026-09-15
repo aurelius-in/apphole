@@ -9,7 +9,7 @@ Decided so the product can ship without waiting on later choices.
 5. **Job runner:** `after()` on Vercel so the HTTP response can return a scan id. Local Node runs the crawl in-process immediately. No extra worker vendor yet.
 6. **Browser automation:** Public HTTP crawler is the default (Cheerio + fetch). Playwright is optional (`APPHOLE_PLAYWRIGHT=1`) and not required for a useful Free report. Runtime console and screenshots stay **couldn't verify** until a browser worker is enabled.
 7. **Evidence storage:** HTTP status, headers, URLs, extracted text snippets, and finding objects on the scan record. No full page HTML retained after analysis.
-8. **Stripe:** Checkout + Customer Portal + webhooks. Pro price lives in `STRIPE_PRO_PRICE_ID`. Amount is not hardcoded in the UI.
+8. **Stripe:** Checkout + Customer Portal + webhooks. AppHole Pro is $29/month. The Stripe price id is `STRIPE_PRO_PRICE_ID`. Production `apphole.pro` uses live-mode keys.
 9. **Scan quotas:** Free 3 / rolling 31 days, 8 pages. Pro 40 / 31 days, 24 pages. Cookie anonymous id + optional user id.
 10. **Retention:** Scans kept in the store (capped at 400 records). Deletion via hello@apphole.pro until a self-serve delete button exists.
 11. **Public vs authenticated scanning:** v1 is public GET-only. No passwords collected. Authenticated flows are Pro later.
