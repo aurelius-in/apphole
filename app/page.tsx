@@ -162,7 +162,7 @@ export default function HomePage() {
 
       <section className="bg-ah-ink py-16 text-white">
         <div className="mx-auto max-w-3xl px-4 text-center">
-          <Image src="/ah-logo.png" alt="" className="mx-auto h-20 w-20 object-contain" width={80} height={80} />
+          <Image src="/ah-logo-on-black.png" alt="" className="mx-auto h-20 w-20 object-contain" width={80} height={80} />
           <h2 className="mt-6 text-3xl font-bold">{brand.heroHeadline}</h2>
           <p className="mt-3 text-white/70">{brand.tagline}</p>
           <Link href="/check" className="mt-8 inline-flex rounded-full bg-ah-blue px-6 py-3 font-semibold text-white hover:bg-ah-blue-dark">
