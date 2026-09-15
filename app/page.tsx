@@ -4,6 +4,7 @@ import { AnatomyAccordion } from "@/components/AnatomyAccordion";
 import { CategoryGrid } from "@/components/CategoryGrid";
 import { CheckForm } from "@/components/CheckForm";
 import { FaqList } from "@/components/FaqList";
+import { HeroLogo } from "@/components/HeroLogo";
 import { LandingTracker } from "@/components/LandingTracker";
 import { PricingSplit } from "@/components/PricingSplit";
 import { ReportView } from "@/components/ReportView";
@@ -37,14 +38,7 @@ export default function HomePage() {
             </p>
           </div>
           <div className="flex flex-col items-center">
-            <Image
-              src="/ah-logo.png"
-              alt="AppHole logo: a glossy red apple with a hole, blue swirl on the left and green swirl on the right"
-              className="w-full max-w-md object-contain"
-              width={520}
-              height={520}
-              priority
-            />
+            <HeroLogo />
           </div>
         </div>
       </section>
