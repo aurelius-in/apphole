@@ -1,0 +1,17 @@
+node_modules
+.next
+out
+dist
+coverage
+data
+.tmp
+*.log
+.env
+.env.local
+.env.*.local
+.vercel
+playwright-report
+test-results
+.DS_Store
+Thumbs.db
+docs-temp-instructions.md
