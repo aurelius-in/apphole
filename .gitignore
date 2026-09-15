@@ -14,4 +14,6 @@ playwright-report
 test-results
 .DS_Store
 Thumbs.db
+tsconfig.tsbuildinfo
+*.tsbuildinfo
 docs-temp-instructions.md

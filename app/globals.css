@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --ah-blue: #008cff;
+  --ah-red: #e31b23;
+  --ah-green: #21d14a;
+  --ah-ink: #12141a;
+  --ah-muted: #5a6270;
+  color-scheme: light;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-ah-bg text-ah-ink antialiased;
+}
+
+:focus-visible {
+  outline: 3px solid #008cff;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.ah-badge {
+  @apply inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold tracking-wide;
+}
+
+.prose-ah a {
+  @apply text-ah-blue underline-offset-2 hover:underline;
+}
