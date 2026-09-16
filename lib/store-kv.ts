@@ -60,12 +60,9 @@ function redisKv(url: string, token: string): Kv {
 async function blobKv(): Promise<Kv> {
   const { get, put, BlobNotFoundError } = await import("@vercel/blob");
   const token = process.env.BLOB_READ_WRITE_TOKEN?.trim();
-  const storeId = process.env.BLOB_STORE_ID?.trim();
-  const auth = {
-    ...(token ? { token } : {}),
-    ...(storeId ? { storeId } : {}),
-  };
-  const pathnameFor = (key: string) => `apphole/${storeNamespace()}/${encodeURIComponent(key)}.json`;
+  const auth = token ? { token } : {};
+  const pathnameFor = (key: string) =>
+    `apphole/${storeNamespace()}/${key.replace(/:/g, "/").replace(/[^a-zA-Z0-9._/-]+/g, "_")}.json`;
 
   return {
     name: "blob",
