@@ -36,6 +36,8 @@ STRIPE_PRO_PRICE_ID=
 
 Optional: `OPENAI_API_KEY` plus `APPHOLE_AI_PLUGS=1` for plug wording only.
 
+Scans must persist across serverless instances. Do not rely on `data/store.json` on Vercel. This project is connected to a private Vercel Blob store (`apphole-data`) which sets `BLOB_READ_WRITE_TOKEN` and `BLOB_STORE_ID`. You can instead set `DATABASE_URL` or Upstash `KV_REST_API_URL` + `KV_REST_API_TOKEN`.
+
 ## 3. GoDaddy DNS for AppHole.pro
 
 Registrar: GoDaddy. Domain: AppHole.pro.
@@ -77,6 +79,16 @@ stripe listen --forward-to localhost:3333/api/stripe/webhook
 ## 5. Email (later)
 
 After DNS: `hello@apphole.pro` and `reports@apphole.pro` on Resend or Postmark. Not required for scans.
+
+Plug-quote leads are stored in `data/store.json` (`plugLeads`). To email the team when someone submits the form, set in Vercel:
+
+```
+PLUG_LEAD_NOTIFY_EMAIL=hello@apphole.pro
+PLUG_LEAD_FROM_EMAIL=AppHole <hello@apphole.pro>
+RESEND_API_KEY=
+```
+
+Optional: `PLUG_LEAD_WEBHOOK_URL` to POST the lead JSON to Slack or your own inbox worker. Quote follow-up is manual. Do not create a Stripe charge for quotes.
 
 ## 6. Verify production
 

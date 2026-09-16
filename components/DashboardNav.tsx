@@ -27,9 +27,17 @@ export async function DashboardNav() {
             </button>
           </form>
         ) : (
-          <Link href="/login" className="rounded-xl px-3 py-2 hover:bg-ah-bg">
-            Log in to save history
-          </Link>
+          <>
+            <Link href="/login" className="rounded-xl px-3 py-2 hover:bg-ah-bg">
+              Log in
+            </Link>
+            <Link href="/signup" className="rounded-xl px-3 py-2 hover:bg-ah-bg">
+              Sign up
+            </Link>
+            <Link href="/go-pro" className="rounded-xl px-3 py-2 hover:bg-ah-bg">
+              Go Pro
+            </Link>
+          </>
         )}
       </nav>
     </aside>

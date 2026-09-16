@@ -1,4 +1,4 @@
-import type { Finding, ReadinessVerdict } from "@/lib/scans/types";
+import { isAppHole, type Finding, type ReadinessVerdict } from "@/lib/scans/types";
 
 export function scoreVerdict(findings: Finding[]): {
   verdict: ReadinessVerdict;
@@ -15,7 +15,7 @@ export function scoreVerdict(findings: Finding[]): {
   const notBlockingCount = findings.filter((f) => f.disposition === "NOT_BLOCKING_A_SALE").length;
   const unverifiedCount = findings.filter((f) => f.disposition === "COULDNT_VERIFY").length;
   const passCount = findings.filter((f) => f.disposition === "PASS").length;
-  const holeCount = blockerCount + testBeforeCount + notBlockingCount;
+  const holeCount = findings.filter((f) => isAppHole(f.disposition)).length;
 
   const homepageDead = findings.some(
     (f) => f.disposition === "FIX_BEFORE_SELLING" && /homepage did not load/i.test(f.title),

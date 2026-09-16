@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { DashboardNav } from "@/components/DashboardNav";
+import { GoProLink } from "@/components/GoProLink";
 import { getSessionUserId, readAnonymousId } from "@/lib/auth";
 import { planForUser } from "@/lib/entitlements";
 import { listScansFor } from "@/lib/store";
@@ -7,7 +8,12 @@ import { VERDICT_LABEL } from "@/lib/scans/types";
 
 export const metadata = { title: "Dashboard | AppHole" };
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ checkout?: string; welcome?: string }>;
+}) {
+  const { checkout, welcome } = await searchParams;
   const userId = await getSessionUserId();
   const anonymousId = await readAnonymousId();
   const plan = await planForUser(userId);
@@ -22,6 +28,39 @@ export default async function DashboardPage() {
           <h1 className="text-3xl font-bold">Overview</h1>
           <p className="mt-1 text-sm text-ah-muted">Plan: {plan === "pro" ? "AppHole Pro" : "AppHole Free"}</p>
         </div>
+        {welcome === "1" && userId && (
+          <p className="rounded-xl bg-emerald-50 p-3 text-sm">
+            You&apos;re in. Your AppHole account is ready.{" "}
+            {plan === "pro" ? "Pro is active." : (
+              <>
+                <GoProLink className="font-semibold text-ah-green-dark">Go Pro</GoProLink> for deeper crawls, history, and retests.
+              </>
+            )}
+          </p>
+        )}
+        {checkout === "success" && (
+          <p className="rounded-xl bg-emerald-50 p-3 text-sm">
+            You&apos;re in. Payment finished. Pro turns on when Stripe confirms the subscription.
+          </p>
+        )}
+        {checkout === "already" && (
+          <p className="rounded-xl bg-emerald-50 p-3 text-sm">This account already has AppHole Pro.</p>
+        )}
+        {checkout === "pending" && userId && (
+          <p className="rounded-xl bg-emerald-50 p-3 text-sm">
+            You&apos;re in. Your AppHole account is ready. Card checkout is not live in this environment yet. Free checks still run.
+          </p>
+        )}
+        {!userId && (
+          <p className="rounded-xl border border-ah-line bg-white p-3 text-sm">
+            You are browsing without an account.{" "}
+            <Link href={`/signup?next=${encodeURIComponent("/dashboard?welcome=1")}`} className="font-semibold text-ah-blue">
+              Create an account
+            </Link>{" "}
+            to save scans, or{" "}
+            <GoProLink className="font-semibold text-ah-green-dark">Go Pro</GoProLink>.
+          </p>
+        )}
         <section className="rounded-3xl border border-ah-line bg-white p-6 shadow-sm">
           {latest?.report ? (
             <>

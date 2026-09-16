@@ -17,3 +17,7 @@ Thumbs.db
 tsconfig.tsbuildinfo
 *.tsbuildinfo
 docs-temp-instructions.md
+
+.vercel
+.env*
+!.env.example

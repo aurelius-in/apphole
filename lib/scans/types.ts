@@ -133,6 +133,22 @@ export type UserRecord = {
   createdAt: string;
 };
 
+export type PlugLeadSource = "report" | "example" | "pricing";
+
+export type PlugLead = {
+  id: string;
+  email: string;
+  description: string;
+  findingId?: string;
+  findingTitle?: string;
+  scanId?: string;
+  scanUrl?: string;
+  source: PlugLeadSource;
+  createdAt: string;
+  notifiedAt?: string;
+  notifyError?: string;
+};
+
 export const DISPOSITION_LABEL: Record<Disposition, string> = {
   FIX_BEFORE_SELLING: "FIX BEFORE SELLING",
   TEST_BEFORE_BUILDING: "TEST BEFORE BUILDING",
@@ -140,6 +156,11 @@ export const DISPOSITION_LABEL: Record<Disposition, string> = {
   COULDNT_VERIFY: "COULDN'T VERIFY",
   PASS: "PASS",
 };
+
+/** AppHoles are findings a customer might hit. Passes and couldn't-verify are checks, not holes. */
+export function isAppHole(disposition: Disposition): boolean {
+  return disposition === "FIX_BEFORE_SELLING" || disposition === "TEST_BEFORE_BUILDING" || disposition === "NOT_BLOCKING_A_SALE";
+}
 
 export const VERDICT_LABEL: Record<ReadinessVerdict, string> = {
   READY_TO_FACE_CUSTOMERS: "READY TO FACE CUSTOMERS",

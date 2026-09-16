@@ -26,6 +26,7 @@ export function Footer() {
           </div>
           <div className="flex flex-col gap-2">
             <Link href="/example">Example report</Link>
+            <Link href="/example#plug-quote">Get a plug quote</Link>
             <Link href="/methodology">Methodology</Link>
             <Link href="/check">Check my AppHole</Link>
             <Link href="/contact">Contact</Link>
@@ -35,6 +36,7 @@ export function Footer() {
             <Link href="/terms">Terms</Link>
             <Link href="/login">Log in</Link>
             <Link href="/signup">Sign up</Link>
+            <Link href="/go-pro">Go Pro</Link>
           </div>
         </div>
       </div>

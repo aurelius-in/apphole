@@ -10,7 +10,6 @@ import { PricingSplit } from "@/components/PricingSplit";
 import { ReportView } from "@/components/ReportView";
 import { brand } from "@/lib/brand";
 import { exampleReport } from "@/lib/scans/example";
-import { stripeConfigured } from "@/lib/stripe";
 
 export default function HomePage() {
   return (
@@ -26,7 +25,7 @@ export default function HomePage() {
             <p className="mt-4 text-xl font-semibold text-ah-ink">{brand.heroSubhead}</p>
             <p className="mt-4 max-w-xl text-ah-muted">{brand.heroBody}</p>
             <p className="mt-3 max-w-xl text-sm text-ah-muted">
-              AppHole checks your app for the things that can break, confuse, embarrass, or stop a customer from buying, then tells you what actually deserves fixing before you sell.
+              We look for the things that can break, confuse, embarrass, or stop a customer from buying, then tell you which holes to fix before you sell and which can wait.
             </p>
             <div className="mt-8 max-w-lg">
               <CheckForm />
@@ -48,7 +47,7 @@ export default function HomePage() {
         <h2 className="mt-3 text-3xl font-bold">This is what the judgment looks like.</h2>
         <p className="mt-2 max-w-2xl text-ah-muted">Not a score out of 100. A short list of holes, each with a disposition so you stop hiding in the backlog.</p>
         <div className="mt-8">
-          <ReportView report={exampleReport} example />
+          <ReportView report={exampleReport} example showPlugQuote={false} />
         </div>
       </section>
 
@@ -140,9 +139,9 @@ export default function HomePage() {
       <section id="pricing" className="bg-white py-16">
         <div className="mx-auto max-w-6xl px-4">
           <h2 className="text-3xl font-bold">Free vs Pro</h2>
-          <p className="mt-2 text-ah-muted">Two plans. Free has to be useful. Pro goes deeper and lets you retest.</p>
+          <p className="mt-2 text-ah-muted">Two plans. Free has to be useful. Pro is $29/month. Tap Go Pro to create an account and pay.</p>
           <div className="mt-8">
-            <PricingSplit stripeReady={stripeConfigured()} />
+            <PricingSplit />
           </div>
         </div>
       </section>

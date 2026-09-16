@@ -18,7 +18,7 @@ export default function TermsPage() {
         Reports can be incomplete. A pass means this check did not observe a blocker, not that customers will buy or that no holes exist.
       </p>
       <p className="mt-4">
-        Free and Pro quotas may change. Pro billing is handled by Stripe when configured. You can cancel through the Stripe billing portal.
+        Free and Pro quotas may change. Pro billing is handled by Stripe when configured. You can cancel through the Stripe billing portal. A plug-quote request asks a human to examine a described hole and price the fix. It is not a Stripe charge and not a promise that the hole is already plugged.
       </p>
     </article>
   );

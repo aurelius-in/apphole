@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-const paths = ["", "/check", "/example", "/pricing", "/methodology", "/privacy", "/terms", "/contact", "/login", "/signup"];
+const paths = ["", "/check", "/example", "/pricing", "/methodology", "/privacy", "/terms", "/contact", "/login", "/signup", "/go-pro"];
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = "https://apphole.pro";

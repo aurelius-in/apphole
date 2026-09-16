@@ -31,6 +31,14 @@ const faqs = [
     q: "Is this a security audit?",
     a: "No. AppHole can catch obvious security and permission problems. It is not a penetration test, compliance audit, or certification.",
   },
+  {
+    q: "Will AppHole plug the hole for me?",
+    a: "The free scan lists holes. Plugging is a separate paid job. Describe a hole on a report and an AppHole Pro will examine it and quote a price to fix it. The $29/month Pro plan is for deeper crawls, history, and retests, not for a human repair quote.",
+  },
+  {
+    q: "How do I get AppHole Pro?",
+    a: "Open Free vs Pro and tap Go Pro. Create an email and password, pay $29/month in Stripe Checkout, then land in your dashboard. Free scans do not require an account.",
+  },
 ];
 
 export function FaqList() {

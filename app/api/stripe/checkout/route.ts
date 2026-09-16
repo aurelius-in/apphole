@@ -1,18 +1,25 @@
 import { NextResponse } from "next/server";
 import { getSessionUserId, siteUrl } from "@/lib/auth";
+import { planForUser } from "@/lib/entitlements";
 import { getUserById, updateUser } from "@/lib/store";
 import { checkoutUrls, getStripe, stripeConfigured } from "@/lib/stripe";
 
 export async function GET() {
-  if (!stripeConfigured()) {
-    return NextResponse.redirect(new URL("/pricing", siteUrl()));
-  }
   const userId = await getSessionUserId();
   if (!userId) {
-    return NextResponse.redirect(new URL("/signup?next=/dashboard/billing", siteUrl()));
+    return NextResponse.redirect(new URL("/signup?next=/go-pro", siteUrl()));
   }
   const user = await getUserById(userId);
-  if (!user) return NextResponse.redirect(new URL("/signup?next=/dashboard/billing", siteUrl()));
+  if (!user) {
+    return NextResponse.redirect(new URL("/signup?next=/go-pro", siteUrl()));
+  }
+  const plan = await planForUser(userId);
+  if (plan === "pro") {
+    return NextResponse.redirect(new URL("/dashboard?checkout=already", siteUrl()));
+  }
+  if (!stripeConfigured()) {
+    return NextResponse.redirect(new URL("/dashboard?welcome=1&checkout=pending", siteUrl()));
+  }
 
   const stripe = getStripe();
   let customerId = user.stripeCustomerId;

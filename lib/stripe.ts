@@ -14,7 +14,7 @@ export function getStripe() {
 export function checkoutUrls() {
   const base = siteUrl();
   return {
-    success: `${base}/dashboard/billing?checkout=success`,
+    success: `${base}/dashboard?checkout=success`,
     cancel: `${base}/pricing?checkout=cancel`,
   };
 }

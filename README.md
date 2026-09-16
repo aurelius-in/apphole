@@ -33,6 +33,7 @@ npm run build
 2. AppHole fetches the homepage and a limited set of public same-origin routes.
 3. It turns observations into findings with dispositions: **FIX BEFORE SELLING**, **TEST BEFORE BUILDING**, **NOT BLOCKING A SALE**, **COULDN'T VERIFY**, or **PASS**.
 4. You get a readiness verdict. Not a vanity score.
+5. If you want a hole plugged, describe it on the report. An AppHole Pro examines it and quotes a price. That is not the $29/month crawl plan.
 
 ## Routes
 
@@ -42,15 +43,18 @@ npm run build
 | `/check` | Scan intake |
 | `/scan/[id]` | Live progress and report |
 | `/example` | Example report |
-| `/pricing` | Free vs Pro |
+| `/pricing` | Free vs Pro, plus a compact plug-quote form |
 | `/methodology` | What is and is not checked |
 | `/dashboard` | Saved scans |
 | `/login` `/signup` | Optional accounts |
 | `/privacy` `/terms` `/contact` | Legal and contact |
 | `/api/scans` | Start a check |
+| `/api/plug-quotes` | Store an AppHole Pro plug-quote lead |
 | `/api/stripe/checkout` | Stripe Checkout for Pro |
 | `/api/stripe/webhook` | Subscription sync |
 | `/api/stripe/portal` | Billing portal |
+
+Plug-quote leads: stored with scans (local `data/store.json` key `plugLeads`, or the production Blob/Redis/Postgres store). On Vercel set `PLUG_LEAD_NOTIFY_EMAIL` and `RESEND_API_KEY` so the team is emailed.
 
 ## Brand
 

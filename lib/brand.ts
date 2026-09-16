@@ -9,7 +9,7 @@ export const brand = {
   heroHeadline: "Don't expose your AppHole in public.",
   heroSubhead: "Find the holes before your customers do.",
   heroBody:
-    "AppHole checks the parts of your app customers actually encounter, then separates the holes worth fixing from the things that can wait.",
+    "We scan the customer-facing surface: the public path through the parts of your app people actually encounter.",
   primaryCta: "Check my AppHole",
   secondaryCta: "See an example report",
   footerLine: "Don't expose your AppHole in public.",

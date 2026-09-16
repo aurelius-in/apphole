@@ -4,6 +4,7 @@ import { z } from "zod";
 import { getAnonymousId, getSessionUserId } from "@/lib/auth";
 import { planForUser } from "@/lib/entitlements";
 import { monthlyScanLimit } from "@/lib/plans";
+import { clientIp, rateLimited } from "@/lib/rate-limit";
 import { executeScan } from "@/lib/scans/run";
 import { countScansThisMonth, createScan, updateScan } from "@/lib/store";
 import { assertPublicHttpUrl } from "@/lib/ssrf";
@@ -17,6 +18,9 @@ export const maxDuration = 60;
 
 export async function POST(req: Request) {
   try {
+    if (rateLimited(`scan:${clientIp(req)}`, 20, 60 * 60 * 1000)) {
+      return NextResponse.json({ error: "Too many checks from this network. Try again later." }, { status: 429 });
+    }
     const json = await req.json();
     const body = bodySchema.parse(json);
     const url = await assertPublicHttpUrl(body.url);
@@ -57,7 +61,14 @@ export async function POST(req: Request) {
     else void run();
     return NextResponse.json({ id: scan.id, status: scan.status });
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ error: "Enter a valid URL and confirm you are authorized to test it." }, { status: 400 });
+    }
     const message = error instanceof Error ? error.message : "Could not start scan.";
-    return NextResponse.json({ error: message }, { status: 400 });
+    const userFacing =
+      /valid URL|http and https|not allowed|Private or local|Could not resolve|quota|Production storage is not configured|authorized/i.test(
+        message,
+      );
+    return NextResponse.json({ error: userFacing ? message : "Could not start the check." }, { status: 400 });
   }
 }

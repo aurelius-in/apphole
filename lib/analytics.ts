@@ -15,6 +15,8 @@ export type AnalyticsEvent =
   | "ah_checkout_started"
   | "ah_subscription_started"
   | "ah_retest_started"
+  | "ah_plug_quote_submit"
+  | "ah_plug_quote_success"
   | "ah_faq_expand";
 
 export function track(event: AnalyticsEvent, props?: Record<string, unknown>) {

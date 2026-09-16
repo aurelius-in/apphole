@@ -1,11 +1,9 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { useRouter } from "next/navigation";
 import { track } from "@/lib/analytics";
 
 export function CheckForm({ compact = false }: { compact?: boolean }) {
-  const router = useRouter();
   const [url, setUrl] = useState("");
   const [authorized, setAuthorized] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -24,6 +22,7 @@ export function CheckForm({ compact = false }: { compact?: boolean }) {
     try {
       const res = await fetch("/api/scans", {
         method: "POST",
+        cache: "no-store",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url, authorized: true }),
       });
@@ -32,7 +31,7 @@ export function CheckForm({ compact = false }: { compact?: boolean }) {
         throw new Error(data.error || "Could not start the check.");
       }
       track("ah_scan_started", { id: data.id });
-      router.push(`/scan/${data.id}`);
+      window.location.assign(`/scan/${data.id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not start the check.");
       setBusy(false);
