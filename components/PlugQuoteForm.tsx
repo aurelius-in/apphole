@@ -117,14 +117,13 @@ export function PlugQuoteForm({
 
   return (
     <section id="plug-quote" className="rounded-3xl border-2 border-ah-green bg-white p-5 shadow-card sm:p-6">
-      <p className="text-sm font-semibold uppercase tracking-wider text-ah-green-dark">Plug a leak</p>
-      <h2 className={`mt-2 font-bold tracking-tight ${compact ? "text-xl" : "text-2xl sm:text-3xl"}`}>
-        {source === "report" ? "Get a plug quote for this leak" : HEADLINE}
+      <h2 className={`font-bold tracking-tight ${compact ? "text-xl" : "text-2xl sm:text-3xl"}`}>
+        {HEADLINE}
       </h2>
       <p className="mt-2 max-w-2xl text-sm leading-6 text-ah-muted sm:text-base">
-        {compact
-          ? "Email us the leak and we will quote a plug. The $29/month plan is a separate crawl subscription. This form does not charge you."
-          : "Email us the leak and we will quote a plug. Pick a hole from this report if you want us to start there. A human prices the fix. No charge on this form."}
+        {findings.length > 0
+          ? "We will email a price to plug the leak you pick."
+          : "We will email a price to plug the leak."}
       </p>
 
       <form onSubmit={onSubmit} className={`relative ${compact ? "mt-4 space-y-3" : "mt-5 space-y-4"}`}>
@@ -212,12 +211,12 @@ export function PlugQuoteForm({
           disabled={busy}
           className="inline-flex w-full items-center justify-center rounded-full bg-ah-green px-5 py-3 text-base font-semibold text-ah-ink shadow-sm hover:bg-ah-green-dark hover:text-white disabled:opacity-60 sm:w-auto"
         >
-          {busy ? "Sending..." : source === "report" ? "Get a plug quote for this leak" : "Get a quote"}
+          {busy ? "Sending..." : "Get a quote"}
         </button>
 
         <div>
           <label htmlFor={descId} className="mb-1 block text-sm font-medium text-ah-muted">
-            {descriptionOptional ? "More detail (optional if you picked a hole)" : "Describe the hole"}
+            {descriptionOptional ? "More detail (optional)" : "Describe the hole"}
           </label>
           <textarea
             id={descId}
@@ -228,9 +227,7 @@ export function PlugQuoteForm({
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder={
-              compact
-                ? "What leaks, where it happens, and who it blocks."
-                : "Optional note, or skip this if you picked a hole above."
+              descriptionOptional ? "Optional note." : "What leaks, where it happens, and who it blocks."
             }
             aria-invalid={error?.toLowerCase().includes("describe") || undefined}
             aria-describedby={error ? errorId : undefined}
