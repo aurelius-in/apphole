@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { DashboardNav } from "@/components/DashboardNav";
 import { GoProLink } from "@/components/GoProLink";
+import { ProPayCta } from "@/components/ProPayCta";
 import { getSessionUserId, readAnonymousId } from "@/lib/auth";
 import { planForUser } from "@/lib/entitlements";
 import { listScansFor } from "@/lib/store";
@@ -28,15 +29,8 @@ export default async function DashboardPage({
           <h1 className="text-3xl font-bold">Overview</h1>
           <p className="mt-1 text-sm text-ah-muted">Plan: {plan === "pro" ? "AppHole Pro" : "AppHole Free"}</p>
         </div>
-        {welcome === "1" && userId && (
-          <p className="rounded-xl bg-emerald-50 p-3 text-sm">
-            You&apos;re in. Your AppHole account is ready.{" "}
-            {plan === "pro" ? "Pro is active." : (
-              <>
-                <GoProLink className="font-semibold text-ah-green-dark">Go Pro</GoProLink> for deeper crawls, history, and retests.
-              </>
-            )}
-          </p>
+        {welcome === "1" && userId && plan === "pro" && (
+          <p className="rounded-xl bg-emerald-50 p-3 text-sm">You&apos;re in. Pro is active.</p>
         )}
         {checkout === "success" && (
           <p className="rounded-xl bg-emerald-50 p-3 text-sm">
@@ -46,11 +40,7 @@ export default async function DashboardPage({
         {checkout === "already" && (
           <p className="rounded-xl bg-emerald-50 p-3 text-sm">This account already has AppHole Pro.</p>
         )}
-        {checkout === "pending" && userId && (
-          <p className="rounded-xl bg-emerald-50 p-3 text-sm">
-            You&apos;re in. Your AppHole account is ready. Card checkout is not live in this environment yet. Free checks still run.
-          </p>
-        )}
+        {userId && plan !== "pro" && <ProPayCta />}
         {!userId && (
           <p className="rounded-xl border border-ah-line bg-white p-3 text-sm">
             You are browsing without an account.{" "}

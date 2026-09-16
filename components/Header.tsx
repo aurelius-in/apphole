@@ -5,6 +5,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { GoProLink } from "@/components/GoProLink";
+import { PayProButton } from "@/components/PayProButton";
+import { PRO_PRICE_LABEL } from "@/lib/pricing";
 
 const links = [
   { href: "/#product", label: "Product" },
@@ -82,11 +84,18 @@ export function Header() {
               </Link>
             </>
           )}
-          {!isPro && (
-            <GoProLink className="inline-flex rounded-full bg-ah-green px-4 py-2 text-sm font-semibold text-ah-ink hover:bg-ah-green-dark hover:text-white">
-              Go Pro
-            </GoProLink>
-          )}
+          {!isPro &&
+            (loggedIn ? (
+              <PayProButton
+                compact
+                label={`Pay ${PRO_PRICE_LABEL}`}
+                className="inline-flex rounded-full bg-ah-green px-4 py-2 text-sm font-semibold text-ah-ink hover:bg-ah-green-dark hover:text-white disabled:opacity-60"
+              />
+            ) : (
+              <GoProLink className="inline-flex rounded-full bg-ah-green px-4 py-2 text-sm font-semibold text-ah-ink hover:bg-ah-green-dark hover:text-white">
+                Go Pro
+              </GoProLink>
+            ))}
           {!onDashboard && (
             <Link
               href="/check"
@@ -97,11 +106,18 @@ export function Header() {
           )}
         </div>
         <div className="flex items-center gap-2 lg:hidden">
-          {!isPro && (
-            <GoProLink className="inline-flex rounded-full bg-ah-green px-3 py-2 text-sm font-semibold text-ah-ink">
-              Go Pro
-            </GoProLink>
-          )}
+          {!isPro &&
+            (loggedIn ? (
+              <PayProButton
+                compact
+                label={`Pay ${PRO_PRICE_LABEL}`}
+                className="inline-flex rounded-full bg-ah-green px-3 py-2 text-sm font-semibold text-ah-ink disabled:opacity-60"
+              />
+            ) : (
+              <GoProLink className="inline-flex rounded-full bg-ah-green px-3 py-2 text-sm font-semibold text-ah-ink">
+                Go Pro
+              </GoProLink>
+            ))}
           <button
             type="button"
             className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-ah-line"
@@ -126,11 +142,14 @@ export function Header() {
             <Link href="/check" className="font-semibold text-ah-blue" onClick={close}>
               Check my AppHole
             </Link>
-            {!isPro && (
-              <GoProLink className="font-semibold text-ah-green-dark" onNavigate={close}>
-                Go Pro
-              </GoProLink>
-            )}
+            {!isPro &&
+              (loggedIn ? (
+                <PayProButton compact label={`Pay ${PRO_PRICE_LABEL}`} className="font-semibold text-ah-green-dark" />
+              ) : (
+                <GoProLink className="font-semibold text-ah-green-dark" onNavigate={close}>
+                  Go Pro
+                </GoProLink>
+              ))}
             {loggedIn ? (
               <Link href="/dashboard" onClick={close}>
                 Dashboard
