@@ -25,9 +25,9 @@ export default async function GoProPage({
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-14">
-      <p className="mb-6 text-sm text-ah-muted">Your AppHole account is ready. Pay to start Pro.</p>
+      <p className="mb-6 text-sm text-ah-muted">Your AppHole account is ready. Subscribe to start Pro.</p>
       {pay === "canceled" && (
-        <p className="mb-4 rounded-xl bg-amber-50 p-3 text-sm">Checkout was canceled. Pay below when you are ready.</p>
+        <p className="mb-4 rounded-xl bg-amber-50 p-3 text-sm">Checkout was canceled. Subscribe below when you are ready.</p>
       )}
       <ProPayCta size="hero" initialError={initialError} />
     </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { track } from "@/lib/analytics";
-import { PRO_PRICE_LABEL } from "@/lib/pricing";
+import { CTA_SUBSCRIBE } from "@/lib/pricing";
 
 const FULL_CLASS =
   "inline-flex w-full items-center justify-center rounded-full bg-ah-green px-6 py-4 text-lg font-bold text-ah-ink shadow-sm hover:bg-ah-green-dark hover:text-white disabled:opacity-60";
@@ -9,7 +9,7 @@ const COMPACT_CLASS =
   "inline-flex rounded-full bg-ah-green px-4 py-2 text-sm font-semibold text-ah-ink hover:bg-ah-green-dark hover:text-white disabled:opacity-60";
 
 export function PayProButton({
-  label = `Pay ${PRO_PRICE_LABEL}`,
+  label = CTA_SUBSCRIBE,
   compact = false,
   className,
   initialError,

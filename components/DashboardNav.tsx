@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getSessionUserId } from "@/lib/auth";
 import { planForUser } from "@/lib/entitlements";
-import { PRO_PRICE_LABEL } from "@/lib/pricing";
+import { CTA_GO_PRO, CTA_UPGRADE } from "@/lib/pricing";
 
 const items = [
   { href: "/dashboard", label: "Overview" },
@@ -28,7 +28,7 @@ export async function DashboardNav() {
             href="/go-pro"
             className="rounded-xl bg-ah-green px-3 py-2 font-semibold text-ah-ink hover:bg-ah-green-dark hover:text-white"
           >
-            Pay {PRO_PRICE_LABEL}
+            {CTA_UPGRADE}
           </Link>
         )}
         {userId ? (
@@ -46,7 +46,7 @@ export async function DashboardNav() {
               Sign up
             </Link>
             <Link href="/go-pro" className="rounded-xl px-3 py-2 hover:bg-ah-bg">
-              Go Pro
+              {CTA_GO_PRO}
             </Link>
           </>
         )}

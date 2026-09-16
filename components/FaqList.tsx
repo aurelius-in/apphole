@@ -37,7 +37,7 @@ const faqs = [
   },
   {
     q: "How do I get AppHole Pro?",
-    a: "Open Free vs Pro and tap Go Pro. Create an email and password, then tap Pay $29/month. That opens Stripe Checkout when billing is live. Free scans do not require an account.",
+    a: "Open Free vs Pro and tap Go Pro. Create an email and password, then tap Subscribe. That opens Stripe Checkout when billing is live. Free scans do not require an account.",
   },
 ];
 

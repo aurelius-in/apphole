@@ -50,7 +50,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
 
   return (
     <>
-      <h1 className="text-3xl font-bold">{mode === "signup" ? (toPro ? "Create account, then pay" : "Create an account") : "Log in"}</h1>
+      <h1 className="text-3xl font-bold">{mode === "signup" ? (toPro ? "Create account, then subscribe" : "Create an account") : "Log in"}</h1>
       <p className="mt-2 text-sm text-ah-muted">
         {mode === "signup" && toPro
           ? `Make a login, then continue to Stripe Checkout for AppHole Pro (${PRO_PRICE_LABEL}).`

@@ -3,7 +3,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { GoProLink } from "@/components/GoProLink";
 import { PayProButton } from "@/components/PayProButton";
-import { PRO_PRICE_LABEL } from "@/lib/pricing";
+import { CTA_GO_PRO, CTA_SUBSCRIBE } from "@/lib/pricing";
 
 type MeResponse = {
   user: { id: string } | null;
@@ -12,9 +12,9 @@ type MeResponse = {
 
 export function GoProOrPay({
   className,
-  children = "Go Pro",
+  children = CTA_GO_PRO,
   onNavigate,
-  payLabel = `Pay ${PRO_PRICE_LABEL}`,
+  payLabel = CTA_SUBSCRIBE,
 }: {
   className?: string;
   children?: ReactNode;

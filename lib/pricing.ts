@@ -3,3 +3,7 @@ export const PRO_PRICE_LABEL = "$29/month";
 export const PRO_INTERVAL = "month" as const;
 export const PRO_PRODUCT_NAME = "AppHole Pro";
 export const GO_PRO_PATH = "/go-pro";
+export const CTA_GO_PRO = "Go Pro";
+export const CTA_SUBSCRIBE = "Subscribe";
+export const CTA_UPGRADE = "Upgrade";
+export const CTA_CONTINUE_CHECKOUT = "Continue to checkout";

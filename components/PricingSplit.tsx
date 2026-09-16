@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { GoProOrPay } from "@/components/GoProOrPay";
-import { PRO_PRICE_LABEL } from "@/lib/pricing";
+import { CTA_GO_PRO, CTA_SUBSCRIBE, PRO_PRICE_LABEL } from "@/lib/pricing";
 
 export function PricingSplit() {
   return (
@@ -35,12 +35,12 @@ export function PricingSplit() {
         </ul>
         <GoProOrPay
           className="mt-6 inline-flex rounded-full bg-ah-green px-6 py-4 text-base font-bold text-ah-ink hover:bg-ah-green-dark hover:text-white"
-          payLabel={`Pay ${PRO_PRICE_LABEL}`}
+          payLabel={CTA_SUBSCRIBE}
         >
-          Go Pro
+          {CTA_GO_PRO}
         </GoProOrPay>
         <p className="mt-3 text-sm text-ah-muted">
-          Logged in? Pay {PRO_PRICE_LABEL} starts checkout. If not, Go Pro creates an account first.
+          Logged in? Subscribe opens Stripe Checkout. If not, Go Pro creates an account first.
         </p>
       </article>
     </div>

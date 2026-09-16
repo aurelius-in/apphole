@@ -1,5 +1,5 @@
 import { PayProButton } from "@/components/PayProButton";
-import { PRO_PRICE_LABEL } from "@/lib/pricing";
+import { CTA_CONTINUE_CHECKOUT, CTA_SUBSCRIBE, PRO_PRICE_LABEL } from "@/lib/pricing";
 
 export function ProPayCta({
   size = "banner",
@@ -17,8 +17,12 @@ export function ProPayCta({
       <h2 className={`mt-2 ${titleClass}`}>Probe deeper with Pro</h2>
       <p className="mt-3 text-xl font-bold text-ah-ink">{PRO_PRICE_LABEL}</p>
       <p className="mt-2 max-w-xl text-base text-ah-ink">Deeper crawls, saved history, and retests after you plug a hole.</p>
+      <p className="mt-2 text-sm text-ah-muted">{PRO_PRICE_LABEL} billed via Stripe.</p>
       <div className="mt-6 max-w-md">
-        <PayProButton initialError={initialError} />
+        <PayProButton
+          label={size === "hero" ? CTA_CONTINUE_CHECKOUT : CTA_SUBSCRIBE}
+          initialError={initialError}
+        />
       </div>
     </section>
   );

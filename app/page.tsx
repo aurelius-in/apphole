@@ -140,7 +140,7 @@ export default function HomePage() {
       <section id="pricing" className="bg-white py-16">
         <div className="mx-auto max-w-6xl px-4">
           <h2 className="text-3xl font-bold">Free vs Pro</h2>
-          <p className="mt-2 text-ah-muted">Two plans. Free has to be useful. Pro is $29/month. Probe deeper with Pro, then tap Pay.</p>
+          <p className="mt-2 text-ah-muted">Two plans. Free has to be useful. Pro is $29/month. Probe deeper with Pro, then subscribe.</p>
           <div className="mt-8">
             <PricingSplit />
           </div>
