@@ -78,7 +78,9 @@ export function parseHtml(snapshot: PageSnapshot, html: string): ParsedPage {
       };
     });
 
-  const text = $("body").text().replace(/\s+/g, " ").trim().slice(0, 20000);
+  const bodyClone = $("body").clone();
+  bodyClone.find("script, style, noscript, template").remove();
+  const text = bodyClone.text().replace(/\s+/g, " ").trim().slice(0, 20000);
 
   return { snapshot, html, $, links: [...links], ctaTexts, imagesMissingAlt, imageCount, forms, text };
 }

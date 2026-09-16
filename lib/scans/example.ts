@@ -101,7 +101,7 @@ export const exampleReport: ScanReport = {
       id: "ex_6",
       category: "privacy",
       title: "Privacy language is incomplete",
-      observed: "A privacy link exists, but it is a one-line placeholder.",
+      observed: "A privacy link exists, but the page is one sentence and does not say what is stored.",
       expected: "If you collect accounts, say what you store.",
       disposition: "NOT_BLOCKING_A_SALE",
       severity: "low",

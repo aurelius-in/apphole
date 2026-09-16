@@ -16,6 +16,12 @@ export function Footer() {
           />
           <p className="mt-4 text-sm font-semibold text-white">{brand.footerLine}</p>
           <p className="mt-1 text-sm text-white/70">{brand.footerSecondary}</p>
+          <p className="mt-3 text-sm text-white/70">
+            © 2026 AppHole.{" "}
+            <a className="font-semibold text-white hover:underline" href="mailto:hello@apphole.pro">
+              hello@apphole.pro
+            </a>
+          </p>
         </div>
         <div className="grid grid-cols-2 gap-8 text-sm text-white/80 sm:grid-cols-3 [&_a]:hover:text-white">
           <div className="flex flex-col gap-2">
@@ -41,7 +47,7 @@ export function Footer() {
         </div>
       </div>
       <div className="border-t border-white/10 py-4 text-center text-xs text-white/50">
-        AppHole checks readiness, not demand. Not a penetration test.
+        © 2026 AppHole. AppHole checks readiness, not demand. Not a penetration test.
       </div>
     </footer>
   );
