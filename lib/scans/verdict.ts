@@ -32,7 +32,7 @@ export function scoreVerdict(findings: Finding[]): {
     summary = `Plug ${blockerCount} AppHole${blockerCount === 1 ? "" : "s"} before putting this in front of buyers. Critical customer-path issues are still open.`;
   } else if (blockerCount > 0) {
     verdict = "PLUG_THESE_FIRST";
-    summary = `Plug ${blockerCount} AppHole${blockerCount === 1 ? "" : "s"} before putting this in front of buyers. The rest can wait or be tested with a real conversation.`;
+    summary = `Plug ${blockerCount} AppHole${blockerCount === 1 ? "" : "s"} before putting this in front of buyers.`;
   } else {
     verdict = "READY_TO_FACE_CUSTOMERS";
     summary = "No known blocker in this public check justifies delaying a buyer conversation. That is not a demand forecast.";
