@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { descriptionFromFinding, formatLeadEmail, plugQuoteSchema } from "@/lib/leads";
+import { descriptionFromFinding, formatLeadEmail, normalizePlugFindings, plugQuoteSchema } from "@/lib/leads";
 import { exampleReport } from "@/lib/scans/example";
 
 describe("plug quote schema", () => {
@@ -29,6 +29,58 @@ describe("plug quote schema", () => {
     });
     expect(result.success).toBe(false);
   });
+
+  it("accepts several picked holes", () => {
+    const parsed = plugQuoteSchema.parse({
+      email: "founder@example.com",
+      description: "Quote the mobile checkout and password reset leaks together.",
+      source: "example",
+      findings: [
+        { id: "ex_1", title: "Checkout fails on mobile" },
+        { id: "ex_3", title: "Password reset link is broken" },
+      ],
+    });
+    expect(parsed.findings).toHaveLength(2);
+    expect(parsed.findings?.[0].id).toBe("ex_1");
+  });
+
+  it("still accepts a single findingId from older clients", () => {
+    const parsed = plugQuoteSchema.parse({
+      email: "founder@example.com",
+      description: "Quote the mobile checkout leak from this report.",
+      source: "example",
+      findingId: "ex_1",
+      findingTitle: "Checkout fails on mobile",
+    });
+    expect(parsed.findingId).toBe("ex_1");
+    expect(parsed.findings).toBeUndefined();
+  });
+});
+
+describe("normalizePlugFindings", () => {
+  it("prefers the findings array and keeps ids plus titles", () => {
+    const holes = normalizePlugFindings({
+      findings: [
+        { id: "ex_1", title: "Checkout fails on mobile" },
+        { id: "ex_2", title: "New users land on an empty dashboard" },
+      ],
+      findingId: "legacy_only",
+      findingTitle: "Should be ignored",
+    });
+    expect(holes).toEqual([
+      { id: "ex_1", title: "Checkout fails on mobile" },
+      { id: "ex_2", title: "New users land on an empty dashboard" },
+    ]);
+  });
+
+  it("falls back to a single findingId", () => {
+    expect(
+      normalizePlugFindings({
+        findingId: "ex_1",
+        findingTitle: "Checkout fails on mobile",
+      }),
+    ).toEqual([{ id: "ex_1", title: "Checkout fails on mobile" }]);
+  });
 });
 
 describe("finding prefill", () => {
@@ -52,5 +104,22 @@ describe("notify email body", () => {
     });
     expect(body).toContain("founder@example.com");
     expect(body).toContain("quote request, not a charge");
+  });
+
+  it("lists several picked holes with ids and titles", () => {
+    const body = formatLeadEmail({
+      id: "lead_multi",
+      email: "founder@example.com",
+      description: "Please quote both leaks.",
+      source: "example",
+      createdAt: "2026-09-16T16:00:00.000Z",
+      findings: [
+        { id: "ex_1", title: "Checkout fails on mobile" },
+        { id: "ex_3", title: "Password reset link is broken" },
+      ],
+    });
+    expect(body).toContain("Picked holes:");
+    expect(body).toContain("Checkout fails on mobile (ex_1)");
+    expect(body).toContain("Password reset link is broken (ex_3)");
   });
 });

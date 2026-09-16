@@ -121,8 +121,17 @@ describe("file store", () => {
       description: "Checkout fails on mobile before Stripe opens.",
       source: "report",
       scanId: "scan_1",
+      findings: [
+        { id: "ex_1", title: "Checkout fails on mobile" },
+        { id: "ex_3", title: "Password reset link is broken" },
+      ],
+      findingId: "ex_1",
+      findingTitle: "Checkout fails on mobile",
     });
-    expect((await getPlugLead(lead.id))?.email).toBe("founder@example.com");
+    const stored = await getPlugLead(lead.id);
+    expect(stored?.email).toBe("founder@example.com");
+    expect(stored?.findings).toHaveLength(2);
+    expect(stored?.findings?.[1].id).toBe("ex_3");
   });
 
   it("omits owner ids from the public scan payload", async () => {

@@ -135,10 +135,16 @@ export type UserRecord = {
 
 export type PlugLeadSource = "report" | "example" | "pricing";
 
+export type PlugLeadFinding = {
+  id: string;
+  title: string;
+};
+
 export type PlugLead = {
   id: string;
   email: string;
   description: string;
+  findings?: PlugLeadFinding[];
   findingId?: string;
   findingTitle?: string;
   scanId?: string;

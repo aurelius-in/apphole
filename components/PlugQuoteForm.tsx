@@ -30,7 +30,7 @@ export function PlugQuoteForm({
   const formId = useId();
   const [email, setEmail] = useState("");
   const [description, setDescription] = useState("");
-  const [selectedId, setSelectedId] = useState<string>("");
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [website, setWebsite] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -39,18 +39,24 @@ export function PlugQuoteForm({
   const emailId = `${formId}-email`;
   const descId = `${formId}-description`;
   const errorId = `${formId}-error`;
-  const useSelect = findings.length > 8;
-  const picked = findings.find((item) => item.id === selectedId);
-  const descriptionOptional = Boolean(picked || scanId || scanUrl);
+  const picked = findings.filter((item) => selectedIds.includes(item.id));
+  const descriptionOptional = picked.length > 0 || Boolean(scanId || scanUrl);
 
-  function pickFinding(id: string) {
-    setSelectedId((current) => (current === id ? "" : id));
+  function toggleFinding(id: string) {
+    setSelectedIds((current) => (current.includes(id) ? current.filter((item) => item !== id) : [...current, id]));
   }
 
   function quoteDescription(): string {
     const typed = description.trim();
     if (typed.length >= 10) return typed;
-    if (picked?.description.trim()) return picked.description.trim();
+    if (picked.length === 1 && picked[0].description.trim()) return picked[0].description.trim();
+    if (picked.length > 1) {
+      const joined = picked
+        .map((item) => item.description.trim() || item.title)
+        .filter(Boolean)
+        .join("\n\n");
+      if (joined.length >= 10) return joined;
+    }
     if (scanUrl) return `Quote request to plug holes from this AppHole report: ${scanUrl}`;
     if (scanId) return `Quote request to plug holes from scan ${scanId}.`;
     return typed;
@@ -70,7 +76,13 @@ export function PlugQuoteForm({
       return;
     }
     setBusy(true);
-    track("ah_plug_quote_submit", { source, scanId, findingId: picked?.id });
+    const selectedFindings = picked.map((item) => ({ id: item.id, title: item.title }));
+    track("ah_plug_quote_submit", {
+      source,
+      scanId,
+      findingId: selectedFindings[0]?.id,
+      findingCount: selectedFindings.length,
+    });
     try {
       const res = await fetch("/api/plug-quotes", {
         method: "POST",
@@ -78,8 +90,9 @@ export function PlugQuoteForm({
         body: JSON.stringify({
           email: trimmedEmail,
           description: trimmedDescription,
-          findingId: picked?.id,
-          findingTitle: picked?.title,
+          findings: selectedFindings,
+          findingId: selectedFindings[0]?.id,
+          findingTitle: selectedFindings[0]?.title,
           scanId,
           scanUrl,
           source,
@@ -90,7 +103,7 @@ export function PlugQuoteForm({
       if (!res.ok) {
         throw new Error(data.error || "Could not send the quote request.");
       }
-      track("ah_plug_quote_success", { source, scanId });
+      track("ah_plug_quote_success", { source, scanId, findingCount: selectedFindings.length });
       setDone(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not send the quote request.");
@@ -108,8 +121,8 @@ export function PlugQuoteForm({
         <p className="text-sm font-semibold uppercase tracking-wider text-ah-green-dark">Quote request received</p>
         <h2 className={`mt-2 font-bold ${compact ? "text-xl" : "text-2xl"}`}>Got it. We will email you a quote.</h2>
         <p className="mt-2 text-sm leading-6 text-ah-muted">
-          A human will look at the leak you flagged and send a price to plug it. This request does not mean the hole is
-          already fixed.
+          A human will look at the leak(s) you flagged and send a price to plug them. This request does not mean the
+          hole is already fixed.
         </p>
       </section>
     );
@@ -122,7 +135,7 @@ export function PlugQuoteForm({
       </h2>
       <p className="mt-2 max-w-2xl text-sm leading-6 text-ah-muted sm:text-base">
         {findings.length > 0
-          ? "We will email a price to plug the leak you pick."
+          ? "We will email a price to plug the leak(s) you pick."
           : "We will email a price to plug the leak."}
       </p>
 
@@ -141,44 +154,40 @@ export function PlugQuoteForm({
 
         {findings.length > 0 && (
           <div>
-            <p className="mb-2 text-sm font-medium" id={`${formId}-holes`}>
-              Pick a hole from this report (optional)
+            <p className="text-sm font-semibold" id={`${formId}-holes`}>
+              Pick your app hole
             </p>
-            {useSelect ? (
-              <select
-                aria-labelledby={`${formId}-holes`}
-                className="w-full rounded-xl border border-ah-line bg-white px-4 py-3 text-sm outline-none ring-ah-green focus:ring-2"
-                value={selectedId}
-                onChange={(e) => setSelectedId(e.target.value)}
-              >
-                <option value="">Skip for now</option>
-                {findings.map((item) => (
-                  <option key={item.id} value={item.id}>
-                    {item.label}
-                  </option>
-                ))}
-              </select>
-            ) : (
-              <div className="flex flex-wrap gap-2" role="group" aria-labelledby={`${formId}-holes`}>
-                {findings.map((item) => {
-                  const selected = selectedId === item.id;
-                  return (
-                    <button
-                      key={item.id}
-                      type="button"
-                      onClick={() => pickFinding(item.id)}
-                      className={`max-w-full break-words rounded-full border px-3 py-1.5 text-left text-xs font-semibold sm:text-sm ${
-                        selected
-                          ? "border-ah-green bg-emerald-50 text-ah-green-dark"
-                          : "border-ah-line bg-ah-bg text-ah-ink hover:border-ah-green"
-                      }`}
-                    >
-                      {item.label}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
+            <p className="mb-2 mt-0.5 text-xs leading-5 text-ah-muted">Optional. Pick none, one, or several.</p>
+            <div
+              className={`space-y-2 ${findings.length > 8 ? "max-h-72 overflow-y-auto pr-1" : ""}`}
+              role="group"
+              aria-labelledby={`${formId}-holes`}
+            >
+              {findings.map((item) => {
+                const selected = selectedIds.includes(item.id);
+                const inputId = `${formId}-hole-${item.id}`;
+                return (
+                  <label
+                    key={item.id}
+                    htmlFor={inputId}
+                    className={`flex min-h-11 cursor-pointer items-start gap-3 rounded-xl border px-3 py-2.5 text-sm ${
+                      selected
+                        ? "border-ah-green bg-emerald-50 text-ah-green-dark"
+                        : "border-ah-line bg-ah-bg text-ah-ink hover:border-ah-green"
+                    }`}
+                  >
+                    <input
+                      id={inputId}
+                      type="checkbox"
+                      checked={selected}
+                      onChange={() => toggleFinding(item.id)}
+                      className="mt-1 h-4 w-4 shrink-0 accent-ah-green"
+                    />
+                    <span className="min-w-0 break-words leading-5">{item.label}</span>
+                  </label>
+                );
+              })}
+            </div>
           </div>
         )}
 
@@ -231,7 +240,7 @@ export function PlugQuoteForm({
             }
             aria-invalid={error?.toLowerCase().includes("describe") || undefined}
             aria-describedby={error ? errorId : undefined}
-            className="w-full resize-y rounded-xl border border-ah-line bg-ah-bg px-4 py-3 text-sm shadow-sm outline-none ring-ah-green focus:ring-2"
+            className="w-full resize-y rounded-xl border border-ah-line bg-ah-bg px-3 py-3 text-sm shadow-sm outline-none ring-ah-green focus:ring-2 sm:px-4"
           />
         </div>
 

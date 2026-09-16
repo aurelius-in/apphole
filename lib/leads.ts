@@ -1,8 +1,13 @@
 import { z } from "zod";
-import type { PlugLead } from "@/lib/scans/types";
+import type { PlugLead, PlugLeadFinding } from "@/lib/scans/types";
 import { clientIp, rateLimited } from "@/lib/rate-limit";
 
 export { clientIp };
+
+const plugFindingSchema = z.object({
+  id: z.string().trim().min(1).max(80),
+  title: z.string().trim().max(200).optional().default(""),
+});
 
 export const plugQuoteSchema = z.object({
   email: z.string().trim().email("Enter a valid email.").max(200),
@@ -11,6 +16,7 @@ export const plugQuoteSchema = z.object({
     .trim()
     .min(10, "Describe the hole you want plugged (at least a sentence).")
     .max(4000, "Keep the description under 4000 characters."),
+  findings: z.array(plugFindingSchema).max(40).optional(),
   findingId: z.string().trim().max(80).optional(),
   findingTitle: z.string().trim().max(200).optional(),
   scanId: z.string().trim().max(80).optional(),
@@ -20,6 +26,26 @@ export const plugQuoteSchema = z.object({
 });
 
 export type PlugQuoteInput = z.infer<typeof plugQuoteSchema>;
+
+export function normalizePlugFindings(input: {
+  findings?: { id: string; title?: string }[];
+  findingId?: string;
+  findingTitle?: string;
+}): PlugLeadFinding[] {
+  const fromArray: PlugLeadFinding[] = [];
+  const seen = new Set<string>();
+  for (const item of input.findings ?? []) {
+    const id = item.id.trim();
+    if (!id || seen.has(id)) continue;
+    seen.add(id);
+    fromArray.push({ id, title: (item.title ?? "").trim() });
+  }
+  if (fromArray.length) return fromArray;
+
+  const legacyId = input.findingId?.trim();
+  if (!legacyId) return [];
+  return [{ id: legacyId, title: input.findingTitle?.trim() || "" }];
+}
 
 export function descriptionFromFinding(finding: {
   title: string;
@@ -39,7 +65,20 @@ export function descriptionFromFinding(finding: {
     .join("\n\n");
 }
 
+function pickedHolesForEmail(lead: PlugLead): PlugLeadFinding[] {
+  if (lead.findings?.length) return lead.findings;
+  if (lead.findingId) return [{ id: lead.findingId, title: lead.findingTitle || "" }];
+  return [];
+}
+
 export function formatLeadEmail(lead: PlugLead): string {
+  const holes = pickedHolesForEmail(lead);
+  const picked =
+    holes.length === 0
+      ? ""
+      : holes.length === 1
+        ? `Picked hole: ${holes[0].title || holes[0].id} (${holes[0].id})`
+        : `Picked holes:\n${holes.map((hole) => `- ${hole.title || hole.id} (${hole.id})`).join("\n")}`;
   const lines = [
     "New AppHole Pro plug-quote request.",
     "",
@@ -48,7 +87,7 @@ export function formatLeadEmail(lead: PlugLead): string {
     `Source: ${lead.source}`,
     lead.scanUrl ? `App URL: ${lead.scanUrl}` : "",
     lead.scanId ? `Scan id: ${lead.scanId}` : "",
-    lead.findingTitle ? `Picked finding: ${lead.findingTitle}` : "",
+    picked,
     "",
     "Description:",
     lead.description,

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { clientIp, notifyPlugLead, plugQuoteRateLimited, plugQuoteSchema } from "@/lib/leads";
+import { clientIp, normalizePlugFindings, notifyPlugLead, plugQuoteRateLimited, plugQuoteSchema } from "@/lib/leads";
 import { createPlugLead, updatePlugLead } from "@/lib/store";
 
 export async function POST(req: Request) {
@@ -21,11 +21,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: true });
     }
 
+    const findings = normalizePlugFindings(body);
     const lead = await createPlugLead({
       email: body.email.toLowerCase(),
       description: body.description,
-      findingId: body.findingId || undefined,
-      findingTitle: body.findingTitle || undefined,
+      findings: findings.length ? findings : undefined,
+      findingId: findings[0]?.id,
+      findingTitle: findings[0]?.title || undefined,
       scanId: body.scanId || undefined,
       scanUrl: body.scanUrl || undefined,
       source: body.source,
