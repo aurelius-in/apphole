@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { setSession, verifyPassword } from "@/lib/auth";
+import { authSecretConfigured, setSession, verifyPassword } from "@/lib/auth";
 import { clientIp, rateLimited } from "@/lib/rate-limit";
 import { getUserByEmail } from "@/lib/store";
 
@@ -11,6 +11,9 @@ const schema = z.object({
 
 export async function POST(req: Request) {
   try {
+    if ((process.env.VERCEL || process.env.NODE_ENV === "production") && !authSecretConfigured()) {
+      return NextResponse.json({ error: "Account login is temporarily unavailable." }, { status: 503 });
+    }
     if (rateLimited(`login:${clientIp(req)}`, 20, 15 * 60 * 1000)) {
       return NextResponse.json({ error: "Too many login attempts. Try again later." }, { status: 429 });
     }

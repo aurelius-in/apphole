@@ -1,4 +1,5 @@
 import { USER_AGENT, SCAN_FETCH_TIMEOUT_MS } from "@/lib/plans";
+import { assertPublicHttpUrl, assertPublicRedirect, isRedirectStatus } from "@/lib/ssrf";
 import type { PageSnapshot } from "@/lib/scans/types";
 
 const HEADER_KEYS = [
@@ -14,20 +15,46 @@ const HEADER_KEYS = [
   "cache-control",
 ];
 
+const MAX_REDIRECTS = 5;
+
+function safeFetchError(error: unknown): string {
+  if (error instanceof Error && /not allowed|private|local|resolve|Redirect/i.test(error.message)) {
+    return "That URL is not a public address AppHole can fetch.";
+  }
+  return "Request failed";
+}
+
+async function fetchPublic(url: string, init: RequestInit, signal: AbortSignal): Promise<{ res: Response; finalUrl: string }> {
+  let current = (await assertPublicHttpUrl(url)).toString();
+  for (let hop = 0; hop <= MAX_REDIRECTS; hop += 1) {
+    const res = await fetch(current, { ...init, redirect: "manual", signal });
+    if (isRedirectStatus(res.status)) {
+      const location = res.headers.get("location");
+      if (!location) return { res, finalUrl: current };
+      current = await assertPublicRedirect(current, location);
+      continue;
+    }
+    return { res, finalUrl: res.url || current };
+  }
+  throw new Error("Too many redirects.");
+}
+
 export async function fetchPage(url: string): Promise<{ snapshot: PageSnapshot; body: string }> {
   const started = Date.now();
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), SCAN_FETCH_TIMEOUT_MS);
   try {
-    const res = await fetch(url, {
-      redirect: "follow",
-      signal: controller.signal,
-      headers: {
-        "User-Agent": USER_AGENT,
-        Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        "Accept-Language": "en-US,en;q=0.8",
+    const { res, finalUrl } = await fetchPublic(
+      url,
+      {
+        headers: {
+          "User-Agent": USER_AGENT,
+          Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+          "Accept-Language": "en-US,en;q=0.8",
+        },
       },
-    });
+      controller.signal,
+    );
     const contentType = res.headers.get("content-type") || "";
     const headers: Record<string, string> = {};
     for (const key of HEADER_KEYS) {
@@ -41,7 +68,7 @@ export async function fetchPage(url: string): Promise<{ snapshot: PageSnapshot; 
     }
     const snapshot: PageSnapshot = {
       url,
-      finalUrl: res.url || url,
+      finalUrl,
       status: res.status,
       ok: res.ok,
       title: "",
@@ -53,7 +80,6 @@ export async function fetchPage(url: string): Promise<{ snapshot: PageSnapshot; 
     };
     return { snapshot, body };
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Request failed";
     return {
       snapshot: {
         url,
@@ -66,7 +92,7 @@ export async function fetchPage(url: string): Promise<{ snapshot: PageSnapshot; 
         headers: {},
         contentType: "",
         bytes: 0,
-        error: message,
+        error: safeFetchError(error),
       },
       body: "",
     };
@@ -79,19 +105,21 @@ export async function probeStatus(url: string): Promise<{ url: string; status: n
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), Math.min(SCAN_FETCH_TIMEOUT_MS, 8000));
   try {
-    const res = await fetch(url, {
-      method: "GET",
-      redirect: "follow",
-      signal: controller.signal,
-      headers: { "User-Agent": USER_AGENT, Accept: "*/*" },
-    });
-    return { url: res.url || url, status: res.status, ok: res.ok };
+    const { res, finalUrl } = await fetchPublic(
+      url,
+      {
+        method: "GET",
+        headers: { "User-Agent": USER_AGENT, Accept: "*/*" },
+      },
+      controller.signal,
+    );
+    return { url: finalUrl, status: res.status, ok: res.ok };
   } catch (error) {
     return {
       url,
       status: 0,
       ok: false,
-      error: error instanceof Error ? error.message : "Request failed",
+      error: safeFetchError(error),
     };
   } finally {
     clearTimeout(timer);

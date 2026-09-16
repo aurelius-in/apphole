@@ -15,4 +15,4 @@ Decided so the product can ship without waiting on later choices.
 11. **Public vs authenticated scanning:** v1 is public GET-only. No passwords collected. Authenticated flows are Pro later.
 12. **Findings vs AI:** Deterministic checks create findings from evidence. Optional LLM rewrite requires `APPHOLE_AI_PLUGS=1` plus a model key. It cannot add holes. Ambient API keys are ignored unless that flag is set.
 
-SSRF: private hosts, localhost, and metadata IPs are rejected after DNS lookup.
+SSRF: private hosts, localhost, metadata IPs, CGNAT, and IPv4-mapped IPv6 are rejected after DNS lookup. Scan fetches do not follow redirects onto those addresses.

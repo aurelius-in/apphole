@@ -49,10 +49,10 @@ export async function POST(req: Request) {
     const run = async () => {
       try {
         await executeScan(scan.id, scan.url, plan);
-      } catch (error) {
+      } catch {
         await updateScan(scan.id, {
           status: "failed",
-          error: error instanceof Error ? error.message : "Scan failed",
+          error: "The scan stopped before a report could be produced.",
           progress: { percent: 100, step: "failed", message: "Scan failed." },
         });
       }

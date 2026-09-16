@@ -133,10 +133,14 @@ describe("file store", () => {
       anonymousId: "anon-secret",
       userId: "user-secret",
     });
-    const pub = toPublicScan(scan);
+    const pub = toPublicScan({
+      ...scan,
+      error: "ECONNREFUSED 127.0.0.1:5432 at /var/task/lib/store.ts",
+    });
     expect(pub.id).toBe(scan.id);
     expect("anonymousId" in pub).toBe(false);
     expect("userId" in pub).toBe(false);
+    expect(pub.error).toBe("The scan stopped before a report could be produced.");
   });
 
   it("refuses file writes on Vercel when no durable store is configured", async () => {

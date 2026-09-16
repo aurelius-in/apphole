@@ -5,7 +5,7 @@ import { parseHtml, pickNextUrls } from "@/lib/scans/parse";
 import { sortFindings, scoreVerdict } from "@/lib/scans/verdict";
 import { enrichPlugs } from "@/lib/ai/plugs";
 import { updateScan } from "@/lib/store";
-import { assertPublicHttpUrl } from "@/lib/ssrf";
+import { assertPublicHttpUrl, tryPublicHttpUrl } from "@/lib/ssrf";
 import type { ParsedPage } from "@/lib/scans/parse";
 import type { ScanReport } from "@/lib/scans/types";
 
@@ -46,8 +46,10 @@ export async function executeScan(scanId: string, rawUrl: string, plan: Plan): P
   for (const next of discovered) {
     if (pages.length >= maxPages) break;
     if (pages.some((p) => p.snapshot.finalUrl.replace(/\/$/, "") === next.replace(/\/$/, ""))) continue;
+    const publicNext = await tryPublicHttpUrl(next);
+    if (!publicNext) continue;
     await sleep(SCAN_GAP_MS);
-    const fetched = await fetchPage(next);
+    const fetched = await fetchPage(publicNext);
     pages.push(parseHtml(fetched.snapshot, fetched.body || "<html></html>"));
     await updateScan(scanId, {
       progress: {
@@ -66,13 +68,17 @@ export async function executeScan(scanId: string, rawUrl: string, plan: Plan): P
   const extras = sensitivePaths(origin);
   const probes = [];
   for (const candidate of navCandidates) {
+    const publicCandidate = await tryPublicHttpUrl(candidate);
+    if (!publicCandidate) continue;
     await sleep(80);
-    probes.push(await probeStatus(candidate));
+    probes.push(await probeStatus(publicCandidate));
   }
   const sensitiveProbes = [];
   for (const candidate of extras) {
+    const publicCandidate = await tryPublicHttpUrl(candidate);
+    if (!publicCandidate) continue;
     await sleep(80);
-    sensitiveProbes.push(await probeStatus(candidate));
+    sensitiveProbes.push(await probeStatus(publicCandidate));
   }
 
   await updateScan(scanId, {

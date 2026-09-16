@@ -6,6 +6,7 @@ import { CheckForm } from "@/components/CheckForm";
 import { FaqList } from "@/components/FaqList";
 import { HeroLogo } from "@/components/HeroLogo";
 import { LandingTracker } from "@/components/LandingTracker";
+import { PlugQuoteForm } from "@/components/PlugQuoteForm";
 import { PricingSplit } from "@/components/PricingSplit";
 import { ReportView } from "@/components/ReportView";
 import { brand } from "@/lib/brand";
@@ -142,6 +143,9 @@ export default function HomePage() {
           <p className="mt-2 text-ah-muted">Two plans. Free has to be useful. Pro is $29/month. Tap Go Pro to create an account and pay.</p>
           <div className="mt-8">
             <PricingSplit />
+          </div>
+          <div className="mt-10">
+            <PlugQuoteForm source="pricing" compact />
           </div>
         </div>
       </section>

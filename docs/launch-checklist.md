@@ -32,11 +32,17 @@ STRIPE_PUBLISHABLE_KEY=
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=
 STRIPE_WEBHOOK_SECRET=
 STRIPE_PRO_PRICE_ID=
+BLOB_READ_WRITE_TOKEN=
+BLOB_STORE_ID=
 ```
 
-Optional: `OPENAI_API_KEY` plus `APPHOLE_AI_PLUGS=1` for plug wording only.
+`AUTH_SECRET` is required in production (16+ characters). Without it, signup and login return 503 and sessions are not minted. Do not reuse the local fallback.
 
-Scans must persist across serverless instances. Do not rely on `data/store.json` on Vercel. This project is connected to a private Vercel Blob store (`apphole-data`) which sets `BLOB_READ_WRITE_TOKEN` and `BLOB_STORE_ID`. You can instead set `DATABASE_URL` or Upstash `KV_REST_API_URL` + `KV_REST_API_TOKEN`.
+Scans must persist across serverless instances. Do not rely on `data/store.json` on Vercel. This project is connected to a private Vercel Blob store (`apphole-data`) which sets `BLOB_READ_WRITE_TOKEN` and `BLOB_STORE_ID`. You can instead set `DATABASE_URL` (preferred for users, leads, and scans in one durable database) or Upstash `KV_REST_API_URL` + `KV_REST_API_TOKEN`. Rate limits today are per serverless instance; a Redis/Postgres limiter would be stricter.
+
+Optional notify for plug quotes: `PLUG_LEAD_NOTIFY_EMAIL` plus `RESEND_API_KEY`, or `PLUG_LEAD_WEBHOOK_URL`.
+
+Optional: `OPENAI_API_KEY` plus `APPHOLE_AI_PLUGS=1` for plug wording only.
 
 ## 3. GoDaddy DNS for AppHole.pro
 

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { scoreVerdict } from "@/lib/scans/verdict";
 import { finding } from "@/lib/scans/finding";
 import { isAppHole } from "@/lib/scans/types";
-import { assertPublicHttpUrl } from "@/lib/ssrf";
+import { assertPublicHttpUrl, assertPublicRedirect } from "@/lib/ssrf";
 import { exampleReport } from "@/lib/scans/example";
 
 describe("verdict", () => {
@@ -94,9 +94,22 @@ describe("isAppHole", () => {
 describe("ssrf", () => {
   it("rejects localhost", async () => {
     await expect(assertPublicHttpUrl("http://localhost:3000")).rejects.toThrow();
+    await expect(assertPublicHttpUrl("http://localhost./")).rejects.toThrow();
   });
 
-  it("rejects metadata IPs", async () => {
+  it("rejects metadata and private IPs", async () => {
     await expect(assertPublicHttpUrl("http://127.0.0.1")).rejects.toThrow();
+    await expect(assertPublicHttpUrl("http://169.254.169.254/latest")).rejects.toThrow();
+    await expect(assertPublicHttpUrl("http://10.0.0.8")).rejects.toThrow();
+    await expect(assertPublicHttpUrl("http://100.64.0.1")).rejects.toThrow();
+    await expect(assertPublicHttpUrl("http://[::1]/")).rejects.toThrow();
+    await expect(assertPublicHttpUrl("http://[::ffff:127.0.0.1]/")).rejects.toThrow();
+    await expect(assertPublicHttpUrl("http://[::ffff:7f00:1]/")).rejects.toThrow();
+  });
+
+  it("does not follow redirects onto private addresses", async () => {
+    await expect(assertPublicRedirect("https://example.com/app", "http://127.0.0.1/")).rejects.toThrow();
+    await expect(assertPublicRedirect("https://example.com/app", "http://169.254.169.254/latest")).rejects.toThrow();
+    await expect(assertPublicRedirect("https://example.com/app", "//localhost/admin")).rejects.toThrow();
   });
 });

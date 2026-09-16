@@ -233,6 +233,9 @@ export async function getScan(id: string): Promise<ScanRecord | undefined> {
 
 export function toPublicScan(scan: ScanRecord): Omit<ScanRecord, "userId" | "anonymousId"> {
   const { userId: _userId, anonymousId: _anonymousId, ...rest } = scan;
+  if (rest.error) {
+    rest.error = "The scan stopped before a report could be produced.";
+  }
   return rest;
 }
 

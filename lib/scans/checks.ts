@@ -35,7 +35,7 @@ export async function runDeterministicChecks(input: {
   const findings: Finding[] = [];
   const checked: string[] = [];
   const couldNotVerify: string[] = [];
-  const allText = pages.map((p) => `${p.snapshot.title} ${p.text} ${p.html}`).join("\n");
+  const visibleText = pages.map((p) => `${p.snapshot.title} ${p.text} ${p.ctaTexts.join(" ")}`).join("\n");
   const allHtml = pages.map((p) => p.html).join("\n");
 
   checked.push("URL reachability and TLS redirect behavior");
@@ -157,7 +157,7 @@ export async function runDeterministicChecks(input: {
   }
 
   checked.push("Placeholder and unfinished copy");
-  const placeholder = home.text.match(PLACEHOLDER_RE) || allText.match(PLACEHOLDER_RE);
+  const placeholder = home.text.match(PLACEHOLDER_RE) || visibleText.match(PLACEHOLDER_RE);
   if (placeholder) {
     findings.push(
       finding({
@@ -176,7 +176,7 @@ export async function runDeterministicChecks(input: {
   }
 
   checked.push("Production hygiene (localhost/staging leaks)");
-  const leak = allHtml.match(LOCAL_LEAK_RE) || allText.match(LOCAL_LEAK_RE);
+  const leak = allHtml.match(LOCAL_LEAK_RE) || visibleText.match(LOCAL_LEAK_RE);
   if (leak) {
     findings.push(
       finding({
@@ -493,7 +493,7 @@ export async function runDeterministicChecks(input: {
   }
 
   checked.push("First-run emptiness signals");
-  if (/\b(no (data|projects|items) yet|nothing here|get started by|your dashboard is empty)\b/i.test(allText)) {
+  if (/\b(no (data|projects|items) yet|nothing here|get started by|your dashboard is empty)\b/i.test(visibleText)) {
     findings.push(
       finding({
         category: "first_run",

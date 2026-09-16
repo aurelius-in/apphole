@@ -6,9 +6,20 @@ import { cookies } from "next/headers";
 const scrypt = promisify(scryptCb);
 const COOKIE = "ah_session";
 
+export function authSecretConfigured(): boolean {
+  return (process.env.AUTH_SECRET?.trim().length || 0) >= 16;
+}
+
+function productionAuthRequired(): boolean {
+  return Boolean(process.env.VERCEL) || process.env.NODE_ENV === "production";
+}
+
 function secretBytes() {
-  const fromEnv = process.env.AUTH_SECRET;
+  const fromEnv = process.env.AUTH_SECRET?.trim();
   if (fromEnv && fromEnv.length >= 16) return new TextEncoder().encode(fromEnv);
+  if (productionAuthRequired()) {
+    throw new Error("AUTH_SECRET is not configured.");
+  }
   const fallback = createHash("sha256").update("apphole-local-dev-only").digest();
   return new Uint8Array(fallback);
 }
@@ -30,6 +41,9 @@ export async function verifyPassword(password: string, stored: string): Promise<
 }
 
 export async function setSession(userId: string) {
+  if (productionAuthRequired() && !authSecretConfigured()) {
+    throw new Error("AUTH_SECRET is not configured.");
+  }
   const token = await new SignJWT({ sub: userId })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
@@ -51,6 +65,7 @@ export async function clearSession() {
 }
 
 export async function getSessionUserId(): Promise<string | null> {
+  if (productionAuthRequired() && !authSecretConfigured()) return null;
   const jar = await cookies();
   const token = jar.get(COOKIE)?.value;
   if (!token) return null;
