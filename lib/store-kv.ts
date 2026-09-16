@@ -58,37 +58,46 @@ function redisKv(url: string, token: string): Kv {
 }
 
 async function blobKv(): Promise<Kv> {
-  const { get, put, BlobNotFoundError } = await import("@vercel/blob");
+  const { get, put, head, BlobNotFoundError } = await import("@vercel/blob");
   const token = process.env.BLOB_READ_WRITE_TOKEN?.trim();
   const auth = token ? { token } : {};
-  const pathnameFor = (key: string) =>
-    `apphole/${storeNamespace()}/${key.replace(/:/g, "/").replace(/[^a-zA-Z0-9._/-]+/g, "_")}.json`;
+  const pathname = `apphole/${storeNamespace()}/kv.json`;
+
+  async function readMap(): Promise<Record<string, string>> {
+    try {
+      const meta = await head(pathname, auth);
+      const result = await get(meta.url, { access: "private", useCache: false, ...auth });
+      if (!result || result.statusCode !== 200 || !result.stream) return {};
+      const text = await new Response(result.stream).text();
+      const parsed = JSON.parse(text) as Record<string, string>;
+      return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
+    } catch (error) {
+      if (error instanceof BlobNotFoundError) return {};
+      throw error;
+    }
+  }
+
+  async function writeMap(map: Record<string, string>) {
+    await put(pathname, JSON.stringify(map), {
+      access: "private",
+      addRandomSuffix: false,
+      allowOverwrite: true,
+      contentType: "application/json",
+      cacheControlMaxAge: 60,
+      ...auth,
+    });
+  }
 
   return {
     name: "blob",
     async get(key: string) {
-      try {
-        const result = await get(pathnameFor(key), {
-          access: "private",
-          useCache: false,
-          ...auth,
-        });
-        if (!result || result.statusCode !== 200 || !result.stream) return null;
-        return await new Response(result.stream).text();
-      } catch (error) {
-        if (error instanceof BlobNotFoundError) return null;
-        throw error;
-      }
+      const map = await readMap();
+      return Object.prototype.hasOwnProperty.call(map, key) ? map[key] : null;
     },
     async set(key: string, value: string) {
-      await put(pathnameFor(key), value, {
-        access: "private",
-        addRandomSuffix: false,
-        allowOverwrite: true,
-        contentType: "application/json",
-        cacheControlMaxAge: 60,
-        ...auth,
-      });
+      const map = await readMap();
+      map[key] = value;
+      await writeMap(map);
     },
   };
 }
