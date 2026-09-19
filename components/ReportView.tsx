@@ -1,3 +1,4 @@
+import { DownloadReportPdf } from "@/components/DownloadReportPdf";
 import { PlugQuoteForm } from "@/components/PlugQuoteForm";
 import { descriptionFromFinding } from "@/lib/leads";
 import { DISPOSITION_LABEL, VERDICT_LABEL, isAppHole, type Disposition, type Finding, type ReadinessVerdict, type ScanReport } from "@/lib/scans/types";
@@ -97,11 +98,16 @@ export function ReportView({
         <p className="ah-badge bg-slate-100 text-slate-700">Example AppHole Report</p>
       )}
       <div className={`rounded-3xl border-2 p-6 ${VERDICT_CLASS[report.verdict]}`}>
-        <p className="text-sm font-semibold uppercase tracking-wider">{VERDICT_LABEL[report.verdict]}</p>
-        <h2 className="mt-2 text-3xl font-bold tracking-tight">
-          {holes.length} {holeLabel}
-        </h2>
-        <p className="mt-2 max-w-2xl text-ah-ink/80">{report.verdictSummary}</p>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-wider">{VERDICT_LABEL[report.verdict]}</p>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight">
+              {holes.length} {holeLabel}
+            </h2>
+            <p className="mt-2 max-w-2xl text-ah-ink/80">{report.verdictSummary}</p>
+          </div>
+          <DownloadReportPdf report={report} example={example} scanId={scanId} />
+        </div>
         <dl className="mt-5 grid grid-cols-2 gap-3 text-sm sm:grid-cols-5">
           <div>
             <dt className="text-ah-muted">Fix first</dt>

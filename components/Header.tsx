@@ -48,28 +48,28 @@ export function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-40 border-b border-ah-line/80 bg-white/90 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
-        <Link href="/" className="flex min-w-0 items-center gap-3" onClick={close}>
-          <Image src="/ah-logo.png" alt="" className="h-10 w-10 shrink-0 object-contain" width={40} height={40} />
+    <header className="sticky top-0 z-40 overflow-x-clip border-b border-ah-line/80 bg-white/90 backdrop-blur">
+      <div className="mx-auto grid w-full min-w-0 max-w-6xl grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-2 px-4 py-2 lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:gap-x-6">
+        <Link href="/" className="z-10 col-start-1 row-start-1 justify-self-start" onClick={close} aria-label="AppHole home">
           <Image
-            src="/ah-title.png"
-            alt="AppHole"
-            className="h-8 w-auto max-w-[140px] object-contain object-left sm:max-w-[220px]"
-            width={220}
-            height={48}
+            src="/ah-logo.png"
+            alt=""
+            className="h-14 w-14 shrink-0 object-contain sm:h-16 sm:w-16 lg:h-[120px] lg:w-[120px]"
+            width={120}
+            height={120}
+            priority
           />
         </Link>
-        {!onDashboard && (
-          <nav className="hidden items-center gap-6 text-sm font-medium text-ah-muted lg:flex" aria-label="Primary">
-            {links.map((link) => (
-              <Link key={link.href} href={link.href} className="hover:text-ah-ink">
-                {link.label}
-              </Link>
-            ))}
-          </nav>
-        )}
-        <div className="hidden items-center gap-3 lg:flex">
+        <Link
+          href="/"
+          className="z-10 col-span-3 row-start-2 flex min-w-0 w-full max-w-full items-center justify-center px-1 pb-1 sm:px-3 lg:col-span-1 lg:col-start-2 lg:row-start-1 lg:w-auto lg:pb-0"
+          onClick={close}
+        >
+          <span className="relative block h-7 w-[176px] max-w-full sm:h-8 sm:w-[220px] lg:h-8 lg:w-[240px]">
+            <Image src="/ah-title.png" alt="AppHole" fill className="object-contain object-center" sizes="240px" priority />
+          </span>
+        </Link>
+        <div className="col-start-3 row-start-1 hidden items-center justify-self-end gap-3 lg:flex">
           {loggedIn ? (
             <Link href="/dashboard" className="text-sm font-medium text-ah-muted hover:text-ah-ink">
               Dashboard
@@ -105,7 +105,7 @@ export function Header() {
             </Link>
           )}
         </div>
-        <div className="flex items-center gap-2 lg:hidden">
+        <div className="col-start-3 row-start-1 flex shrink-0 items-center justify-self-end gap-2 lg:hidden">
           {!isPro &&
             (loggedIn ? (
               <PayProButton
@@ -130,6 +130,18 @@ export function Header() {
           </button>
         </div>
       </div>
+      {!onDashboard && (
+        <nav
+          className="mx-auto hidden max-w-6xl items-center justify-center gap-6 px-4 pb-2.5 text-sm font-medium text-ah-muted lg:flex"
+          aria-label="Primary"
+        >
+          {links.map((link) => (
+            <Link key={link.href} href={link.href} className="hover:text-ah-ink">
+              {link.label}
+            </Link>
+          ))}
+        </nav>
+      )}
       {open && (
         <div className="border-t border-ah-line bg-white px-4 py-3 lg:hidden">
           <nav className="flex flex-col gap-3 text-sm font-medium" aria-label="Mobile">
