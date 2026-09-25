@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { track } from "@/lib/analytics";
+import { trackActivity } from "@/lib/activity-client";
 import { safeNextPath, wantsProCheckout, withNextQuery } from "@/lib/safe-next";
 import { PRO_PRICE_LABEL } from "@/lib/pricing";
 
@@ -18,6 +19,13 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [payAfterSignup, setPayAfterSignup] = useState(toPro);
+  const [signupNoted, setSignupNoted] = useState(false);
+
+  function noteSignupStart() {
+    if (mode !== "signup" || signupNoted) return;
+    setSignupNoted(true);
+    trackActivity("signup_started");
+  }
 
   const submitNext = mode === "signup" && payAfterSignup ? "/go-pro" : next;
 
@@ -25,6 +33,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
     event.preventDefault();
     setBusy(true);
     setError(null);
+    if (mode === "signup") trackActivity("signup_submitted");
     const res = await fetch(mode === "signup" ? "/api/auth/signup" : "/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -34,9 +43,11 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
     const data = (await res.json()) as { error?: string };
     setBusy(false);
     if (!res.ok) {
+      if (mode === "signup") trackActivity("signup_failed");
       setError(data.error || "Could not continue.");
       return;
     }
+    if (mode === "signup") trackActivity("signup_completed");
     if (mode === "signup") track("ah_free_signup");
     if (submitNext === "/go-pro") {
       track("ah_pro_click");
@@ -72,7 +83,11 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
               required
               autoComplete="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onFocus={noteSignupStart}
+              onChange={(e) => {
+                noteSignupStart();
+                setEmail(e.target.value);
+              }}
               className="w-full rounded-xl border border-ah-line px-4 py-3"
             />
           </div>

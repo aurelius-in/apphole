@@ -16,7 +16,7 @@ export default function HomePage() {
   return (
     <div>
       <LandingTracker />
-      <section className="relative overflow-hidden bg-white">
+      <section data-track-section="hero" className="relative overflow-hidden bg-white">
         <div className="pointer-events-none absolute -left-24 top-10 h-64 w-64 rounded-full bg-ah-blue/10 blur-3xl" />
         <div className="pointer-events-none absolute -right-16 bottom-0 h-64 w-64 rounded-full bg-ah-green/10 blur-3xl" />
         <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-14 lg:grid-cols-2 lg:py-20">
@@ -43,7 +43,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="product" className="mx-auto max-w-6xl px-4 py-16">
+      <section id="product" data-track-section="example-report" className="mx-auto max-w-6xl px-4 py-16">
         <p className="text-xs font-bold uppercase tracking-[0.2em] text-ah-red">Example AppHole Report</p>
         <h2 className="mt-3 text-3xl font-bold">This is what the judgment looks like.</h2>
         <p className="mt-2 max-w-2xl text-ah-muted">Not a score out of 100. A short list of holes, each with a disposition so you stop hiding in the backlog.</p>
@@ -52,7 +52,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="bg-white py-16">
+      <section data-track-section="dispositions" className="bg-white py-16">
         <div className="mx-auto max-w-6xl px-4">
           <h2 className="text-3xl font-bold">Four dispositions. That is the product.</h2>
           <div className="mt-8 grid gap-4 md:grid-cols-2">
@@ -71,7 +71,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="anatomy" className="mx-auto max-w-6xl px-4 py-16">
+      <section id="anatomy" data-track-section="anatomy" className="mx-auto max-w-6xl px-4 py-16">
         <p className="text-xs font-bold uppercase tracking-[0.2em] text-ah-green-dark">AppHole Anatomy</p>
         <h2 className="mt-3 text-3xl font-bold">Everybody has an AppHole.</h2>
         <p className="mt-2 max-w-2xl text-ah-muted">The trick is knowing which ones matter before a customer finds them for you.</p>
@@ -111,7 +111,7 @@ export default function HomePage() {
         </article>
       </section>
 
-      <section id="how-it-works" className="bg-white py-16">
+      <section id="how-it-works" data-track-section="how-it-works" className="bg-white py-16">
         <div className="mx-auto max-w-6xl px-4">
           <h2 className="text-3xl font-bold">How an AppHole Check works</h2>
           <ol className="mt-8 grid gap-4 md:grid-cols-4">
@@ -137,7 +137,7 @@ export default function HomePage() {
         </p>
       </section>
 
-      <section id="pricing" className="bg-white py-16">
+      <section id="pricing" data-track-section="pricing" className="bg-white py-16">
         <div className="mx-auto max-w-6xl px-4">
           <h2 className="text-3xl font-bold">Free vs Pro</h2>
           <p className="mt-2 text-ah-muted">Two plans. Free has to be useful. Pro is $29/month. Probe deeper with Pro, then subscribe.</p>
@@ -150,7 +150,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="faq" className="mx-auto max-w-6xl px-4 py-16">
+      <section id="faq" data-track-section="faq" className="mx-auto max-w-6xl px-4 py-16">
         <h2 className="text-3xl font-bold">FAQ</h2>
         <div className="mt-8">
           <FaqList />

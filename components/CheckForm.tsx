@@ -2,12 +2,14 @@
 
 import { FormEvent, useState } from "react";
 import { track } from "@/lib/analytics";
+import { trackActivity } from "@/lib/activity-client";
 
 export function CheckForm({ compact = false }: { compact?: boolean }) {
   const [url, setUrl] = useState("");
   const [authorized, setAuthorized] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [focused, setFocused] = useState(false);
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
@@ -51,6 +53,11 @@ export function CheckForm({ compact = false }: { compact?: boolean }) {
           required
           placeholder="https://myapp.com"
           value={url}
+          onFocus={() => {
+            if (focused) return;
+            setFocused(true);
+            trackActivity("check_focused");
+          }}
           onChange={(e) => setUrl(e.target.value)}
           className="w-full rounded-xl border border-ah-line bg-white px-4 py-3 text-base shadow-sm outline-none ring-ah-blue focus:ring-2"
         />

@@ -30,4 +30,10 @@ export function track(event: AnalyticsEvent, props?: Record<string, unknown>) {
     // ignore quota
   }
   window.dispatchEvent(new CustomEvent("ah:event", { detail: payload }));
+  const safe: Record<string, string | number | boolean> = {};
+  for (const [key, value] of Object.entries(payload.props)) {
+    if (typeof value === "string") safe[key] = value.slice(0, 160);
+    else if (typeof value === "number" || typeof value === "boolean") safe[key] = value;
+  }
+  void import("@/lib/activity-client").then(({ trackActivity }) => trackActivity(event, safe));
 }
