@@ -1,5 +1,7 @@
 "use client";
 
+import { mirrorPixelEvent } from "@/lib/meta-pixel";
+
 const VISITOR_KEY = "ah_visitor";
 const SESSION_KEY = "ah_session";
 const UTM_KEY = "ah_utm";
@@ -43,6 +45,7 @@ function utm(): { source: string; medium: string; campaign: string } {
 
 export function trackActivity(name: string, props: TrackProps = {}, dwellMs = 0, path?: string) {
   if (typeof window === "undefined") return;
+  mirrorPixelEvent(name);
   let visitorId = "";
   let sessionId = "";
   try {

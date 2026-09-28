@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { trackActivity } from "@/lib/activity-client";
+import { pixelPageView } from "@/lib/meta-pixel";
 
 const seenSections = new Set<string>();
 
@@ -10,6 +11,7 @@ export function ActivityTracker() {
   const pathname = usePathname();
   const entered = useRef(Date.now());
   const pathRef = useRef(pathname);
+  const firstView = useRef(true);
 
   useEffect(() => {
     if (pathname.startsWith("/ops")) return;
@@ -21,6 +23,11 @@ export function ActivityTracker() {
     pathRef.current = pathname;
     entered.current = Date.now();
     trackActivity("page_view", { page: pathname });
+    if (firstView.current) {
+      firstView.current = false;
+    } else {
+      pixelPageView();
+    }
     if (pathname === "/signup") trackActivity("signup_view");
     if (pathname === "/example") trackActivity("ah_example_report_viewed");
   }, [pathname]);

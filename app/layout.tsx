@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import { ActivityTracker } from "@/components/ActivityTracker";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
+import { MetaPixel } from "@/components/MetaPixel";
 import { SiteFrame } from "@/components/SiteFrame";
 import { brand } from "@/lib/brand";
 import "./globals.css";
@@ -42,6 +43,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={jakarta.variable}>
       <body className="min-h-screen font-sans">
+        <MetaPixel />
         <ActivityTracker />
         <SiteFrame header={<Header />} footer={<Footer />}>
           <main>{children}</main>

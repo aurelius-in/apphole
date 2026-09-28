@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CheckoutSuccessPixel } from "@/components/CheckoutSuccessPixel";
 import { DashboardNav } from "@/components/DashboardNav";
 import { GoProLink } from "@/components/GoProLink";
 import { ProPayCta } from "@/components/ProPayCta";
@@ -33,9 +34,12 @@ export default async function DashboardPage({
           <p className="rounded-xl bg-emerald-50 p-3 text-sm">You&apos;re in. Pro is active.</p>
         )}
         {checkout === "success" && (
-          <p className="rounded-xl bg-emerald-50 p-3 text-sm">
-            You&apos;re in. Payment finished. Pro turns on when Stripe confirms the subscription.
-          </p>
+          <>
+            <CheckoutSuccessPixel />
+            <p className="rounded-xl bg-emerald-50 p-3 text-sm">
+              You&apos;re in. Payment finished. Pro turns on when Stripe confirms the subscription.
+            </p>
+          </>
         )}
         {checkout === "already" && (
           <p className="rounded-xl bg-emerald-50 p-3 text-sm">This account already has AppHole Pro.</p>
