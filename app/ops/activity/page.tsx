@@ -5,7 +5,6 @@ import {
   ACTIVITY_RANGES,
   buildActivityStats,
   parseActivityRange,
-  rangeStartMs,
   type ActivityRange,
   type ActivityStats,
 } from "@/lib/activity-stats";
@@ -32,7 +31,7 @@ export default async function ActivityPage({ searchParams }: { searchParams: Sea
   }
 
   const range = parseActivityRange(rangeRaw);
-  const stats = buildActivityStats(await loadActivity(rangeStartMs(range)), range);
+  const stats = buildActivityStats(await loadActivity(), range);
   return <Board stats={stats} adminKey={key || ""} />;
 }
 

@@ -57,62 +57,47 @@ function redisKv(url: string, token: string): Kv {
   };
 }
 
-/** Private blob per key, so concurrent writes to different keys never clobber each other. */
-export function blobKeyPath(key: string, env: Env = process.env): string {
-  return `apphole/${storeNamespace(env)}/kv/${encodeURIComponent(key)}`;
-}
-
 async function blobKv(): Promise<Kv> {
-  const { get, put, BlobNotFoundError } = await import("@vercel/blob");
+  const { get, put, head, BlobNotFoundError } = await import("@vercel/blob");
   const token = process.env.BLOB_READ_WRITE_TOKEN?.trim();
   const auth = token ? { token } : {};
-  const legacyPath = `apphole/${storeNamespace()}/kv.json`;
-  let legacy: Promise<Record<string, string>> | null = null;
+  const pathname = `apphole/${storeNamespace()}/kv.json`;
 
-  async function readText(pathname: string): Promise<string | null> {
+  async function readMap(): Promise<Record<string, string>> {
     try {
-      const result = await get(pathname, { access: "private", useCache: false, ...auth });
-      if (!result || result.statusCode !== 200 || !result.stream) return null;
-      return await new Response(result.stream).text();
+      const meta = await head(pathname, auth);
+      const result = await get(meta.url, { access: "private", useCache: false, ...auth });
+      if (!result || result.statusCode !== 200 || !result.stream) return {};
+      const text = await new Response(result.stream).text();
+      const parsed = JSON.parse(text) as Record<string, string>;
+      return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
     } catch (error) {
-      if (error instanceof BlobNotFoundError) return null;
+      if (error instanceof BlobNotFoundError) return {};
       throw error;
     }
   }
 
-  /** The old single-map file. Read-only now; kept so earlier users and scans still load. */
-  function readLegacy(): Promise<Record<string, string>> {
-    if (!legacy) {
-      legacy = readText(legacyPath)
-        .then((text) => {
-          const parsed = text ? (JSON.parse(text) as Record<string, string>) : {};
-          return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
-        })
-        .catch(() => {
-          legacy = null;
-          return {};
-        });
-    }
-    return legacy;
+  async function writeMap(map: Record<string, string>) {
+    await put(pathname, JSON.stringify(map), {
+      access: "private",
+      addRandomSuffix: false,
+      allowOverwrite: true,
+      contentType: "application/json",
+      cacheControlMaxAge: 60,
+      ...auth,
+    });
   }
 
   return {
     name: "blob",
     async get(key: string) {
-      const value = await readText(blobKeyPath(key));
-      if (value !== null) return value;
-      const map = await readLegacy();
+      const map = await readMap();
       return Object.prototype.hasOwnProperty.call(map, key) ? map[key] : null;
     },
     async set(key: string, value: string) {
-      await put(blobKeyPath(key), value, {
-        access: "private",
-        addRandomSuffix: false,
-        allowOverwrite: true,
-        contentType: "application/json",
-        cacheControlMaxAge: 60,
-        ...auth,
-      });
+      const map = await readMap();
+      map[key] = value;
+      await writeMap(map);
     },
   };
 }
