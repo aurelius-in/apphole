@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { activityGate } from "@/lib/activity-gate";
 import { loadActivity } from "@/lib/activity-log";
-import { buildActivityStats, dailyKpis, parseActivityRange } from "@/lib/activity-stats";
+import { buildActivityStats, dailyKpis, parseActivityRange, rangeStartMs } from "@/lib/activity-stats";
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +13,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: gate.reason }, { status });
   }
   const range = parseActivityRange(url.searchParams.get("range"));
-  const stats = buildActivityStats(await loadActivity(), range);
+  const stats = buildActivityStats(await loadActivity(rangeStartMs(range)), range);
   return NextResponse.json({
     product: "AppHole",
     range: stats.rangeLabel,
