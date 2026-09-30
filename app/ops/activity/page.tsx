@@ -51,6 +51,11 @@ function Board({ stats, adminKey }: { stats: ActivityStats; adminKey: string }) 
         <header className="text-center">
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-ah-blue">AppHole</p>
           <h1 className="mt-2 text-3xl font-extrabold">Activity</h1>
+          <p className="mt-2 text-sm">
+            <Link className="font-semibold text-ah-blue" href={adminKey ? `/ops/intakes?key=${encodeURIComponent(adminKey)}` : "/ops/intakes"}>
+              Submitted URLs
+            </Link>
+          </p>
           <p className="mt-2 text-sm text-ah-muted">
             {stats.rangeLabel} · checks, time on page, and where people stop before an account ·{" "}
             {new Date(stats.checkedAt).toLocaleString()}

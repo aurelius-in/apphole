@@ -7,7 +7,7 @@ export default function PrivacyPage() {
       <p className="mt-4 text-sm text-ah-muted">Last updated 28 September 2026. This is a product disclosure, not legal advice.</p>
       <div className="mt-8 space-y-4 text-sm leading-7 text-ah-muted">
         <p>
-          AppHole inspects public pages of apps you submit. We store the URL, timestamps, HTTP metadata, extracted text needed for findings, and the resulting report. We do not ask for passwords in the Free check.
+          AppHole inspects public pages of apps you submit, and public GitHub repositories when that is the link you paste. We store every URL entered, with the time and whether it looked like a product, a GitHub repo, or an unrelated site such as a search engine. We also store timestamps, HTTP metadata, extracted text needed for findings, and the resulting report. We do not ask for passwords in the Free check. We use that URL list to follow up on real checks and to separate them from casual tests.
         </p>
         <p>
           Do not submit an app you are not authorized to test. Do not paste secrets into the URL field.

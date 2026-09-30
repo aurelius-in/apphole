@@ -49,9 +49,10 @@ export function CheckForm({ compact = false }: { compact?: boolean }) {
         <input
           id="app-url"
           name="url"
-          type="url"
+          type="text"
+          inputMode="url"
           required
-          placeholder="https://myapp.com"
+          placeholder="https://myapp.com or github.com/you/repo"
           value={url}
           onFocus={() => {
             if (focused) return;
@@ -70,7 +71,7 @@ export function CheckForm({ compact = false }: { compact?: boolean }) {
           onChange={(e) => setAuthorized(e.target.checked)}
         />
         <span>
-          I own this app or I am authorized to test it. AppHole will fetch public pages only. No destructive actions, no real charges, no exploit attempts.
+          I own this app or I am authorized to test it. AppHole will read public pages, or a public GitHub repo if that is what you paste. No destructive actions, no real charges, no exploit attempts.
         </span>
       </label>
       {error && (

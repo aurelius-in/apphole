@@ -1,11 +1,13 @@
 import { SCAN_GAP_MS, pagesForPlan, type Plan } from "@/lib/plans";
 import { runDeterministicChecks, sensitivePaths } from "@/lib/scans/checks";
+import { githubFetch, inspectGithubRepo } from "@/lib/scans/github";
 import { fetchPage, probeStatus } from "@/lib/scans/http";
 import { parseHtml, pickNextUrls } from "@/lib/scans/parse";
 import { sortFindings, scoreVerdict } from "@/lib/scans/verdict";
 import { enrichPlugs } from "@/lib/ai/plugs";
 import { updateScan } from "@/lib/store";
 import { assertPublicHttpUrl, tryPublicHttpUrl } from "@/lib/ssrf";
+import { parseGithubRepo, type GithubRepo } from "@/lib/submission";
 import type { ParsedPage } from "@/lib/scans/parse";
 import type { ScanReport } from "@/lib/scans/types";
 
@@ -14,6 +16,74 @@ function sleep(ms: number) {
 }
 
 export async function executeScan(scanId: string, rawUrl: string, plan: Plan): Promise<ScanReport> {
+  const repo = parseGithubRepo(rawUrl);
+  if (repo) return executeGithubScan(scanId, repo, plan);
+  return executeHttpScan(scanId, rawUrl, plan);
+}
+
+async function executeGithubScan(scanId: string, repo: GithubRepo, plan: Plan): Promise<ScanReport> {
+  const startedAt = new Date().toISOString();
+  await updateScan(scanId, {
+    status: "running",
+    startedAt,
+    url: repo.url,
+    progress: { percent: 8, step: "github", message: "Reading the public GitHub repository." },
+  });
+  const inspection = await inspectGithubRepo(repo, githubFetch);
+  const live = inspection.liveUrl ? await tryPublicHttpUrl(inspection.liveUrl) : null;
+  if (live && !parseGithubRepo(live)) {
+    const httpReport = await executeHttpScan(scanId, live, plan);
+    const findings = sortFindings(await enrichPlugs([...inspection.findings, ...httpReport.findings]));
+    const scored = scoreVerdict(findings);
+    const report: ScanReport = {
+      ...httpReport,
+      mode: "github+http",
+      findings,
+      ...scored,
+      checked: [...inspection.checked, ...httpReport.checked],
+      couldNotVerify: [...inspection.couldNotVerify, ...httpReport.couldNotVerify],
+    };
+    await updateScan(scanId, {
+      status: "complete",
+      completedAt: report.completedAt,
+      report,
+      progress: { percent: 100, step: "done", message: "Report ready." },
+    });
+    return report;
+  }
+
+  const findings = sortFindings(await enrichPlugs(inspection.findings));
+  const scored = scoreVerdict(findings);
+  const completedAt = new Date().toISOString();
+  const report: ScanReport = {
+    url: repo.url,
+    startedAt,
+    completedAt,
+    plan,
+    mode: "github",
+    pagesCrawled: [],
+    findings,
+    verdict: scored.verdict,
+    verdictSummary: scored.summary,
+    holeCount: scored.holeCount,
+    blockerCount: scored.blockerCount,
+    testBeforeCount: scored.testBeforeCount,
+    notBlockingCount: scored.notBlockingCount,
+    unverifiedCount: scored.unverifiedCount,
+    passCount: scored.passCount,
+    checked: inspection.checked,
+    couldNotVerify: inspection.couldNotVerify,
+  };
+  await updateScan(scanId, {
+    status: "complete",
+    completedAt,
+    report,
+    progress: { percent: 100, step: "done", message: "Report ready." },
+  });
+  return report;
+}
+
+async function executeHttpScan(scanId: string, rawUrl: string, plan: Plan): Promise<ScanReport> {
   const startedAt = new Date().toISOString();
   await updateScan(scanId, {
     status: "running",

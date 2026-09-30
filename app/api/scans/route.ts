@@ -5,9 +5,11 @@ import { getAnonymousId, getSessionUserId } from "@/lib/auth";
 import { planForUser } from "@/lib/entitlements";
 import { monthlyScanLimit } from "@/lib/plans";
 import { clientIp, rateLimited } from "@/lib/rate-limit";
+import { attachIntake, recordIntake } from "@/lib/intakes";
 import { executeScan } from "@/lib/scans/run";
 import { countScansThisMonth, createScan, updateScan } from "@/lib/store";
 import { assertPublicHttpUrl } from "@/lib/ssrf";
+import { classifySubmission } from "@/lib/submission";
 
 const bodySchema = z.object({
   url: z.string().min(4),
@@ -22,13 +24,27 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Too many checks from this network. Try again later." }, { status: 429 });
     }
     const json = await req.json();
-    const body = bodySchema.parse(json);
-    const url = await assertPublicHttpUrl(body.url);
+    const rawUrl = typeof json?.url === "string" ? json.url : "";
+    const classified = classifySubmission(rawUrl);
     const userId = (await getSessionUserId()) || undefined;
     const anonymousId = await getAnonymousId();
+    const intake = await recordIntake({
+      raw: classified.raw,
+      normalized: classified.normalized,
+      host: classified.host,
+      kind: classified.kind,
+      realistic: classified.realistic,
+      note: classified.note,
+      outcome: "rejected",
+      anonymousId,
+      userId,
+    });
+    const body = bodySchema.parse({ url: classified.normalized || rawUrl, authorized: json?.authorized });
+    const url = classified.github ? new URL(classified.github.url) : await assertPublicHttpUrl(body.url);
     const plan = await planForUser(userId);
     const used = await countScansThisMonth({ userId, anonymousId });
     if (used >= monthlyScanLimit(plan)) {
+      await attachIntake(intake.id, { rejectReason: "quota" });
       return NextResponse.json(
         {
           error:
@@ -46,6 +62,7 @@ export async function POST(req: Request) {
       userId,
       anonymousId,
     });
+    await attachIntake(intake.id, { scanId: scan.id, outcome: "started" });
     const run = async () => {
       try {
         await executeScan(scan.id, scan.url, plan);

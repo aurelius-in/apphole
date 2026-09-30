@@ -90,7 +90,7 @@ export type ScanReport = {
   startedAt: string;
   completedAt: string;
   plan: "free" | "pro";
-  mode: "http" | "http+playwright";
+  mode: "http" | "http+playwright" | "github" | "github+http";
   pagesCrawled: PageSnapshot[];
   findings: Finding[];
   verdict: ReadinessVerdict;
