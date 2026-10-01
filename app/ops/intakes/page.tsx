@@ -1,29 +1,11 @@
 import Link from "next/link";
-import { activityGate } from "@/lib/activity-gate";
 import { listIntakes, type UrlIntake } from "@/lib/intakes";
 import { getUserById } from "@/lib/store";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Submitted URLs | AppHole", robots: { index: false, follow: false } };
 
-type SearchParams = Promise<{ key?: string }>;
-
-export default async function IntakesPage({ searchParams }: { searchParams: SearchParams }) {
-  const { key } = await searchParams;
-  const gate = activityGate(key);
-  if (!gate.ok) {
-    return (
-      <main className="mx-auto max-w-lg px-4 py-20 text-center">
-        <h1 className="text-2xl font-extrabold">Submitted URLs</h1>
-        <p className="mt-3 text-sm text-ah-muted">
-          {gate.reason === "unconfigured"
-            ? "Set ACTIVITY_ADMIN_SECRET, then open this page with ?key= that secret."
-            : "Add the activity key to the URL: /ops/intakes?key=YOUR_SECRET"}
-        </p>
-      </main>
-    );
-  }
-
+export default async function IntakesPage() {
   const rows = await listIntakes();
   const emails = new Map<string, string>();
   for (const row of rows) {
@@ -45,7 +27,7 @@ export default async function IntakesPage({ searchParams }: { searchParams: Sear
             Every URL entered on the check form. Realistic means a product site or a public GitHub repo. Common sites such as google.com stay in the list so they do not get counted as product tests.
           </p>
           <p className="mt-3 text-sm">
-            <Link className="font-semibold text-ah-blue" href={key ? `/ops/activity?key=${encodeURIComponent(key)}` : "/ops/activity"}>
+            <Link className="font-semibold text-ah-blue" href="/ops/activity">
               Activity
             </Link>
           </p>
